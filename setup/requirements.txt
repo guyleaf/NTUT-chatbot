@@ -1,3 +1,0 @@
-﻿firebase-admin
-marshmallow
-tqdm
