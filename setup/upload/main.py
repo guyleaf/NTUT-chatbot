@@ -61,8 +61,6 @@ def main(_):
     code_names = ["現貨", "缺貨中"]
     codes = firestore_dao.get_product_status_codes(code_names)
 
-    print(codes)
-
     def find_code(name: str) -> Optional[dict[str, Any]]:
         for code in codes:
             if code["name"] == name:
@@ -78,3 +76,5 @@ def main(_):
         del product["quantity"]
 
     firestore_dao.upload_products(products)
+
+    return "200 OK"
