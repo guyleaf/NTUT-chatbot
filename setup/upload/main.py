@@ -3,6 +3,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from typing import Any, Optional
 import json
+import datetime
 
 from settings import project_id
 
@@ -42,6 +43,9 @@ class FirestoreDao:
         products_collection = self._db.collection(u"products")
 
         for product in products:
+            date_time = datetime.datetime.now()
+            product["created_time"] = date_time
+            product["updated_time"] = date_time
             product_document = products_collection.document(product["id"])
             batch_action.create(product_document, product)
 
