@@ -29,7 +29,11 @@ class FirestoreDao:
         self, names: list[str]
     ) -> list[dict[str, Any]]:  # noqa: E501
         codes_document = self._db.collection(u"codes")
-        documents = codes_document.where(u"name", u"in", names).get()
+        documents = (
+            codes_document.where("type", "==", "product_status")
+            .where(u"name", u"in", names)
+            .get()
+        )
 
         return [document.to_dict() for document in documents]
 
