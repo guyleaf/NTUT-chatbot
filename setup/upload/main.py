@@ -20,7 +20,7 @@ class FirestoreDao:
         codes_collection = self._db.collection(u"codes")
 
         for code in data:
-            code_document = codes_collection.document()
+            code_document = codes_collection.document(code["id"])
             batch_action.create(code_document, code)
 
         batch_action.commit()
@@ -42,7 +42,7 @@ class FirestoreDao:
         products_collection = self._db.collection(u"products")
 
         for product in products:
-            product_document = products_collection.document()
+            product_document = products_collection.document(product["id"])
             batch_action.create(product_document, product)
 
         batch_action.commit()
