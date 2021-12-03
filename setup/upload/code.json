@@ -1,51 +1,51 @@
 [
     {
-        "id": 0,
+        "id": "0",
         "type": "product_status",
         "name": "現貨"
     },
     {
-        "id": 1,
+        "id": "1",
         "type": "product_status",
         "name": "缺貨中"
     },
     {
-        "id": 2,
+        "id": "2",
         "type": "product_status",
         "name": "已下架"
     },
     {
-        "id": 3,
+        "id": "3",
         "type": "product_status",
         "name": "已刪除"
     },
     {
-        "id": 4,
+        "id": "4",
         "type": "role",
         "name": "顧客"
     },
     {
-        "id": 5,
+        "id": "5",
         "type": "role",
         "name": "管理員"
     },
     {
-        "id": 6,
+        "id": "6",
         "type": "order_status",
         "name": "已下單"
     },
     {
-        "id": 7,
+        "id": "7",
         "type": "order_status",
         "name": "已出貨"
     },
     {
-        "id": 8,
+        "id": "8",
         "type": "order_status",
         "name": "已完成"
     },
     {
-        "id": 9,
+        "id": "9",
         "type": "order_status",
         "name": "已取消"
     }
