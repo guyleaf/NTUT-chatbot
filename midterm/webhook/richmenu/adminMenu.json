@@ -16,7 +16,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/products",
+                "uri": "/search",
                 "data": "?user_id={}"
             }
         },
@@ -53,8 +53,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/productManagement",
-                "data": "?user_id={}"
+                "uri": "/{}/products"
             }
         },
         {
