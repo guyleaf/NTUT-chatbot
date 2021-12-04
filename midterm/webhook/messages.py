@@ -9,7 +9,7 @@ register_handle_message = get_text_send_message_object("正在為您註冊...")
 register_success_message = get_text_send_message_object("已完成註冊綁定")
 register_failure_message = get_text_send_message_object("註冊失敗，請聯繫相關單位")
 
-welcome_message_for_registered = "您好，{} {}\n"
+welcome_message_for_registered = "您好，{} {}"
 functional_explain_message_for_customer = (
     "我們提供\n"
     + f"1. 查詢 {product_type}：\n"
