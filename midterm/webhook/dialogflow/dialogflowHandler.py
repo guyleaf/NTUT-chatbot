@@ -20,11 +20,17 @@ logger = getLogger("webhook")
 
 class DialogflowHandler:
     def _register_member(self, line_id: str, user_name: str):
-        request_body = {"lineId": line_id, "name": user_name}
-        # TODO: Add auth api key
-        response = requests.post(web_url + "/register", json=request_body)
-        member = json.loads(response.content)
-        return member
+        # request_body = {"lineId": line_id, "name": user_name}
+        # # TODO: Add auth api key
+        # response = requests.post(web_url + "/register", json=request_body)
+        # member = json.loads(response.content)
+        return {
+            "id": "123456789",
+            "line_id": line_id,
+            "name": user_name,
+            "role_id": "5",
+            "favorite_product_ids": [],
+        }
 
     def handle_query_response(self, response: dict[str, Any], line_id: str):
         logger.info("handling query response...")
