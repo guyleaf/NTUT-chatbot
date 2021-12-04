@@ -1,62 +1,15 @@
-﻿import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+﻿import flask
 from typing import Any, Optional
 import json
-import datetime
 
-from settings import project_id
-
-
-class FirestoreDao:
-    _db: firestore.firestore.Client
-
-    def __init__(self):
-        cred = credentials.ApplicationDefault()
-        firebase_admin.initialize_app(cred, {"project_id": project_id})
-        self._db = firestore.client()
-
-    def upload_code_data(self, data: list[dict[str, Any]]):
-        batch_action = self._db.batch()
-        codes_collection = self._db.collection(u"codes")
-
-        for code in data:
-            code_document = codes_collection.document(code["id"])
-            batch_action.create(code_document, code)
-
-        batch_action.commit()
-
-    def get_product_status_codes(
-        self, names: list[str]
-    ) -> list[dict[str, Any]]:  # noqa: E501
-        codes_document = self._db.collection(u"codes")
-        documents = (
-            codes_document.where("type", "==", "product_status")
-            .where(u"name", u"in", names)
-            .get()
-        )
-
-        return [document.to_dict() for document in documents]
-
-    def upload_products(self, products: list[dict[str, Any]]):
-        batch_action = self._db.batch()
-        products_collection = self._db.collection(u"products")
-
-        for product in products:
-            date_time = datetime.datetime.now()
-            product["created_time"] = date_time
-            product["updated_time"] = date_time
-            product_document = products_collection.document(product["id"])
-            batch_action.create(product_document, product)
-
-        batch_action.commit()
+from firestoreDao import firestore_dao
+from settings import admins
 
 
-def main(_):
+def init():
     with open("./code.json", "r", encoding="utf-8") as f:
         codes = json.load(f)
 
-    firestore_dao = FirestoreDao()
     firestore_dao.upload_code_data(codes)
 
     with open("./product.json", "r", encoding="utf-8") as f:
@@ -80,5 +33,28 @@ def main(_):
         del product["quantity"]
 
     firestore_dao.upload_products(products)
+
+
+def reset():
+    firestore_dao.clear_all()
+    init()
+
+
+def register():
+    for user in admins:
+        firestore_dao.add_user(user)
+
+
+def main(request: flask.Request):
+    request_args = request.args
+
+    if request_args["action"] == "register":
+        register()
+    elif request_args["action"] == "init":
+        init()
+    elif request_args["action"] == "reset":
+        reset()
+    else:
+        return "400 Bad Request", 400
 
     return "200 OK"
