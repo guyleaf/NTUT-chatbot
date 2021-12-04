@@ -16,7 +16,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/products",
+                "uri": "/search",
                 "data": "?user_id={}"
             }
         },
