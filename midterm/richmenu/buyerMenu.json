@@ -1,0 +1,59 @@
+{
+    "size": {
+      "width": 1200,
+      "height": 810
+    },
+    "selected": true,
+    "name": "richmenuDemo",
+    "chatBarText": "GPU追蹤 主選單",
+    "areas": [
+      {
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 405
+        },
+        "action": {
+          "type": "postback",
+          "data": "searchGPU"
+        }
+      },
+      {
+        "bounds": {
+          "x": 800,
+          "y": 0,
+          "width": 400,
+          "height": 405
+        },
+        "action": {
+          "type": "postback",
+          "data": "myFavorite"
+        }
+      },
+      {
+        "bounds": {
+          "x": 0,
+          "y": 405,
+          "width": 800,
+          "height": 405
+        },
+        "action": {
+          "type": "postback",
+          "data": "orderRecord"
+        }
+      },
+      {
+        "bounds": {
+          "x": 800,
+          "y": 405,
+          "width": 400,
+          "height": 405
+        },
+        "action": {
+          "type": "postback",
+          "data": "marketReport"
+        }
+      }
+   ]
+}

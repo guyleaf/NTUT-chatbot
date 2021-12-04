@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect
 
 app = Flask(__name__)
 
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     title = "HOME"
@@ -11,6 +12,7 @@ def home():
         return redirect(url_for(request.form.get("website")))
     return render_template('home.html', **locals())
 
+#both
 @app.route('/search_page', methods=['GET', 'POST'])
 def search_page():
     if request.method == 'POST':
@@ -19,6 +21,7 @@ def search_page():
         title = "搜尋商品"
         return render_template("search_page.html", **locals())
 
+#both
 @app.route('/search_result/', methods=['GET', 'POST'])
 def search_result():
     title = "商品列表"
@@ -52,9 +55,9 @@ def search_result():
         }
     return render_template("search_result.html", **locals())
 
-
+#both
 #@app.route('/favorite/<memberId>', methods=['GET', 'POST'])
-@app.route('/favorite', methods=['GET', 'POST'])
+@app.route('/myFavorite', methods=['GET', 'POST'])
 def favorite():
     title = "我的最愛"
     response = {
@@ -75,12 +78,13 @@ def favorite():
                 }
             ]
     }
-    return render_template("favorite.html", **locals())
+    return render_template("myFavorite.html", **locals())
 
-#@app.route('/stock/<memberId>', methods=['GET', 'POST'])
-@app.route('/stock', methods=['GET', 'POST'])
+#seller
+#@app.route('/stockManagement/<memberId>', methods=['GET', 'POST'])
+@app.route('/stockManagement', methods=['GET', 'POST'])
 def stock():
-    title = "我的商品"
+    title = "商品管理"
     response = {
             "products":[
                 {
@@ -101,12 +105,12 @@ def stock():
                 }
             ]
     }
-    return render_template("stock.html", **locals())
+    return render_template("stockManagement.html", **locals())
 
 #@app.route('/record/<memberId>', methods=['GET', 'POST'])
-@app.route('/record', methods=['GET', 'POST'])
+@app.route('/orderRecord', methods=['GET', 'POST'])
 def record():
-    title = "交易紀錄"
+    title = "訂單紀錄"
     response = {
             "records":[
                 {
@@ -130,5 +134,6 @@ def record():
             ]
     }
     return render_template("record.html", **locals())
+
 if __name__ == "__main__":
     app.run(debug=True)
