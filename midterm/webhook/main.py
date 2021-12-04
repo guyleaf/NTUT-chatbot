@@ -4,15 +4,19 @@
     TextMessage,
     PostbackEvent,
 )
+from logging import getLogger
 
 from app import (
-    logger,
     webhook_handler,
     line_bot_api,
-    dialogflow_client,
-    dialogflow_handler,
 )
+from dialogflow.dialogflowClient import DialogflowClient
+from dialogflow.dialogflowHandler import DialogflowHandler
 from messages import welcome_message, error_message
+
+logger = getLogger("webhook")
+dialogflow_client = DialogflowClient()
+dialogflow_handler = DialogflowHandler()
 
 
 def main(request):

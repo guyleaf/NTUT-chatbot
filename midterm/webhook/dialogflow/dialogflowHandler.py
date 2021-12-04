@@ -1,8 +1,9 @@
 ﻿import requests
 import json
 from typing import Any
+from logging import getLogger
 
-from app import logger, line_bot_api, richmenu, firestore_dao
+from app import line_bot_api, richmenu, firestore_dao
 from helpers import get_text_send_message_object
 from ..settings import web_url
 from ..messages import (
@@ -13,6 +14,8 @@ from ..messages import (
     functional_explain_message_for_customer,
     functional_explain_message_for_admin,
 )
+
+logger = getLogger("webhook")
 
 
 class DialogflowHandler:
