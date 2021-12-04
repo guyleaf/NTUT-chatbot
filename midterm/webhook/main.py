@@ -3,17 +3,13 @@
     MessageEvent,
     TextMessage,
 )
-from logging import getLogger
 
-from app import (
-    webhook_handler,
-    line_bot_api,
-)
+from app import webhook_handler, line_bot_api, logger
 from dialogflow.dialogflowClient import DialogflowClient
 from dialogflow.dialogflowHandler import DialogflowHandler
 from messages import welcome_message
 
-logger = getLogger("webhook")
+
 dialogflow_client = DialogflowClient()
 dialogflow_handler = DialogflowHandler()
 
