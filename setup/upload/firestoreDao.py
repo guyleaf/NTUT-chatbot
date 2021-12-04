@@ -61,7 +61,7 @@ class FirestoreDao:
         for code in codes_collection.stream():
             batch_action.delete(code.reference)
 
-        batch_action.delete()
+        batch_action.commit()
 
     def add_user(self, user: dict[str, Any]):
         user_document = self._db.collection(u"users").document()
