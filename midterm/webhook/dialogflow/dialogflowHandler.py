@@ -5,8 +5,8 @@ from logging import getLogger
 
 from app import line_bot_api, richmenu, firestore_dao
 from helpers import get_text_send_message_object
-from ..settings import web_url
-from ..messages import (
+from settings import web_url
+from messages import (
     register_handle_message,
     register_success_message,
     register_failure_message,
