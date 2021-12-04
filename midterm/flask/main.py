@@ -56,9 +56,9 @@ def search_result():
     return render_template("search_result.html", **locals())
 
 #both
-#@app.route('/favorite/<memberId>', methods=['GET', 'POST'])
+#@app.route('/myFavorite/<memberId>', methods=['GET', 'POST'])
 @app.route('/myFavorite', methods=['GET', 'POST'])
-def favorite():
+def myFavorite():
     title = "我的最愛"
     response = {
             "products":[
@@ -79,11 +79,49 @@ def favorite():
             ]
     }
     return render_template("myFavorite.html", **locals())
+#buyer state:-1 處理中, 0 運送中 , 1已完成
+#@app.route('/orderRecord/<memberId>', methods=['GET', 'POST'])
+@app.route('/orderRecord', methods=['GET', 'POST'])
+def orderRecord():
+    title = "訂單紀錄"
+    response = {
+            "records":[
+                {
+                    "name":"3080",
+                    "brand":"ASUS",
+                    "price": 1000,
+                    "quantity": 5,
+                    "date": "11/27",
+                    "state": 0,
+                    "imgSrc": "https://cdn.vox-cdn.com/thumbor/Y8HSRGJGLdHmQlIkOFoA-jUtBzA=/0x0:2640x1749/1200x800/filters:focal(1109x664:1531x1086)/cdn.vox-cdn.com/uploads/chorus_image/image/69746324/twarren_rtx3080.0.jpg"
+                },
+                {
+                    "name":"3070Ti",
+                    "brand":"MSI",
+                    "price": 800,
+                    "quantity": 1,
+                    "date": "11/29",
+                    "state": -1,
+                    "imgSrc":"https://cf.shopee.tw/file/e999d155a61197595757fa4945c589f9"
+                },
+                {
+                    "name":"3070",
+                    "brand":"ROG",
+                    "price": 800,
+                    "quantity": 1,
+                    "date": "12/01",
+                    "state": 1,
+                    "imgSrc":"https://cf.shopee.tw/file/e999d155a61197595757fa4945c589f9"
+                }
+            ]
+    }
+    return render_template("orderRecord.html", **locals())
+
 
 #seller
 #@app.route('/stockManagement/<memberId>', methods=['GET', 'POST'])
 @app.route('/stockManagement', methods=['GET', 'POST'])
-def stock():
+def stockManagement():
     title = "商品管理"
     response = {
             "products":[
@@ -107,33 +145,46 @@ def stock():
     }
     return render_template("stockManagement.html", **locals())
 
-#@app.route('/record/<memberId>', methods=['GET', 'POST'])
-@app.route('/orderRecord', methods=['GET', 'POST'])
-def record():
-    title = "訂單紀錄"
+
+#seller
+#@app.route('/orderManagement/<memberId>', methods=['GET', 'POST'])
+@app.route('/orderManagement', methods=['GET', 'POST'])
+def orderManagement():
+    title = "訂單管理"
     response = {
-            "records":[
+            "orders":[
                 {
-                    "index": 1,
                     "name":"3080",
                     "brand":"ASUS",
                     "price": 1000,
                     "quantity": 5,
                     "date": "11/27",
+                    "state": 0,
                     "imgSrc": "https://cdn.vox-cdn.com/thumbor/Y8HSRGJGLdHmQlIkOFoA-jUtBzA=/0x0:2640x1749/1200x800/filters:focal(1109x664:1531x1086)/cdn.vox-cdn.com/uploads/chorus_image/image/69746324/twarren_rtx3080.0.jpg"
                 },
                 {
-                    "index": 2,
+                    "name":"3070Ti",
+                    "brand":"MSI",
+                    "price": 800,
+                    "quantity": 1,
+                    "date": "11/29",
+                    "state": -1,
+                    "imgSrc":"https://cf.shopee.tw/file/e999d155a61197595757fa4945c589f9"
+                },
+                {
                     "name":"3070",
                     "brand":"ROG",
                     "price": 800,
                     "quantity": 1,
                     "date": "12/01",
+                    "state": 1,
                     "imgSrc":"https://cf.shopee.tw/file/e999d155a61197595757fa4945c589f9"
                 }
             ]
     }
-    return render_template("record.html", **locals())
+    return render_template("orderManagement.html", **locals())
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
