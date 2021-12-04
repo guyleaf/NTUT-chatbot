@@ -15,7 +15,7 @@ from app import (
 from messages import welcome_message, error_message
 
 
-def entry_point(request):
+def main(request):
     # get X-Line-Signature header value
     signature = request.headers.get("X-Line-Signature")
 
