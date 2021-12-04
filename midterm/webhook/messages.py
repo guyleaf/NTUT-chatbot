@@ -4,7 +4,6 @@ from settings import product_type
 
 _welcome_message = f"歡迎使用 {product_type} 購物小幫手"
 welcome_message = get_text_send_message_object(_welcome_message)
-error_message = get_text_send_message_object("請先註冊，再行使用主選單功能")
 
 register_handle_message = get_text_send_message_object("正在為您註冊...")
 register_success_message = get_text_send_message_object("已完成註冊綁定")

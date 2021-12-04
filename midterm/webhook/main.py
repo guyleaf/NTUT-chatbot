@@ -2,7 +2,6 @@
     FollowEvent,
     MessageEvent,
     TextMessage,
-    PostbackEvent,
 )
 from logging import getLogger
 
@@ -12,7 +11,7 @@ from app import (
 )
 from dialogflow.dialogflowClient import DialogflowClient
 from dialogflow.dialogflowHandler import DialogflowHandler
-from messages import welcome_message, error_message
+from messages import welcome_message
 
 logger = getLogger("webhook")
 dialogflow_client = DialogflowClient()
