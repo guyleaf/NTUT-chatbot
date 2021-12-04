@@ -53,13 +53,6 @@ def handle_follow(event: FollowEvent):
     dialogflow_handler.handle_query_response(response, line_id)
 
 
-@webhook_handler.add(PostbackEvent)
-def handle_postback(event: PostbackEvent):
-    reply_token = event.reply_token
-    reply_messages = [error_message]
-    line_bot_api.reply_message(reply_token, reply_messages)
-
-
 @webhook_handler.add(MessageEvent, message=TextMessage)
 def handle_message(event: MessageEvent):
     line_id = event.source.user_id
