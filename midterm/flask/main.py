@@ -67,6 +67,7 @@ def myFavorite(userId):
 @app.route('setFavorite',methods=['POST'])
 def setFavorite(userId, productInfo):
     #process productInfo
+    productInfo = json.load(request.get_json(force=True))
     response = {
         "id": productInfo["id"],
         "name": productInfo["name"],
@@ -79,7 +80,7 @@ def setFavorite(userId, productInfo):
 
 #buyer state:-1 處理中, 0 運送中 , 1已完成
 #@app.route('/orderRecord/<userId>', methods=['GET', 'POST'])
-@app.route('/orderRecord', methods=['GET', 'POST'])
+@app.route('/orderRecord', methods=['GET'])
 def orderRecord(userId):
     title = "訂單紀錄"
     orders = firestoreDAO.getOrder(userId)
@@ -87,19 +88,21 @@ def orderRecord(userId):
 
 @app.route('/updateOrder', methods=['POST'])
 def updateOrder(userId, orderInfo):
-    title = "訂單紀錄"
-    orders = firestoreDAO.updateOrder(userId, orderInfo)
+    #Unable to get userId (value is not in the form request) HAVE TO FIGURE OUT
+    orderInfo = json.load(request.get_json(force=True))
+    firestoreDAO.updateOrder(userId, orderInfo)
     return jsonify('更新訂單成功')
 
 @app.route('/addOrder', methods=['POST'])
 def addOrder(userId, orderInfo):
-    title = "訂單紀錄"
-    orders = firestoreDAO.addOrder(userId, orderInfo)
+    #Unable to get userId (value is not in the form request) HAVE TO FIGURE OUT
+    orderInfo = json.load(request.get_json(force=True))
+    firestoreDAO.addOrder(userId, orderInfo)
     return jsonify('新增訂單成功')
 
 
 #seller
-#@app.route('/stockManagement/<userId>', methods=['GET', 'POST'])
+#@app.route('/stockManagement/<userId>', methods=['GET'])
 @app.route('/stockManagement', methods=['GET'])
 def stockManagement(userId):
     title = "商品管理"
@@ -108,14 +111,24 @@ def stockManagement(userId):
 
 
 #seller
-#@app.route('/orderManagement/<userId>', methods=['GET', 'POST'])
+#@app.route('/orderManagement/<userId>', methods=['GET'])
 @app.route('/orderManagement', methods=['GET'])
 def orderManagement(userId):
     title = "訂單管理"
     orders = firestoreDAO.getOrder(userId)
     return render_template("orderManagement.html", **locals())
 
+@app.route('/addProduct', methods=['POST'])
+def addProduct():
+    productInfo = json.load(request.get_json(force=True))
+    firestoreDAO.addProduct(productInfo)
+    return jsonify('新增商品成功')
 
+@app.route('/updateProduct', methods=['POST'])
+def updateProduct():
+    productInfo = json.load(request.get_json(force=True))
+    firestoreDAO.updateProduct(productInfo)
+    return jsonify('編輯商品成功')
 
 if __name__ == "__main__":
     app.run(debug=True)
