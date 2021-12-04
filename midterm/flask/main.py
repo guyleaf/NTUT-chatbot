@@ -56,7 +56,7 @@ def search_result():
     return render_template("search_result.html", **locals())
 
 #both
-#@app.route('/myFavorite/<memberId>', methods=['GET', 'POST'])
+#@app.route('/myFavorite/<userId>', methods=['GET', 'POST'])
 @app.route('/myFavorite', methods=['GET', 'POST'])
 def myFavorite():
     title = "我的最愛"
@@ -80,7 +80,7 @@ def myFavorite():
     }
     return render_template("myFavorite.html", **locals())
 #buyer state:-1 處理中, 0 運送中 , 1已完成
-#@app.route('/orderRecord/<memberId>', methods=['GET', 'POST'])
+#@app.route('/orderRecord/<userId>', methods=['GET', 'POST'])
 @app.route('/orderRecord', methods=['GET', 'POST'])
 def orderRecord():
     title = "訂單紀錄"
@@ -119,7 +119,7 @@ def orderRecord():
 
 
 #seller
-#@app.route('/stockManagement/<memberId>', methods=['GET', 'POST'])
+#@app.route('/stockManagement/<userId>', methods=['GET', 'POST'])
 @app.route('/stockManagement', methods=['GET', 'POST'])
 def stockManagement():
     title = "商品管理"
@@ -147,7 +147,7 @@ def stockManagement():
 
 
 #seller
-#@app.route('/orderManagement/<memberId>', methods=['GET', 'POST'])
+#@app.route('/orderManagement/<userId>', methods=['GET', 'POST'])
 @app.route('/orderManagement', methods=['GET', 'POST'])
 def orderManagement():
     title = "訂單管理"
