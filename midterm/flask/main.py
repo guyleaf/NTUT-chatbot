@@ -12,7 +12,7 @@ app = Flask(__name__, static_folder="static")
 @app.route("/search", methods=["GET"])
 def get_search_page():
     user_id = request.args.get("user_id")
-    if user_id is None:
+    if not user_id:
         abort(Response("缺少 user_id", 400))
 
     title = "商品搜尋"
@@ -28,35 +28,34 @@ def search_products():
         return errors, 400
 
     search_args = search_args_schema.load(json_data)
+    user_id = search_args["user_id"]
 
-    # TODO: Do something...
+    if not firestoreDAO.is_user_exists(user_id):
+        abort(Response("未知的使用者 ID", 400))
+
+    favorite_product_ids = firestoreDAO.get_favorite_product_ids(user_id)
+    products = firestoreDAO.get_products_by_keyword(
+        search_args["skip"], search_args["take"], search_args["keyword"]
+    )
+
+    product_infos = []
+    for product in products:
+        product_info = None
+
+        for favorite_product_id in favorite_product_ids:
+            if product["id"] == favorite_product_id:
+                product_info = {"is_favorite": True}
+                break
+
+        if product_info is None:
+            product_info = {"is_favorite": False}
+
+        product_info["product"] = product
+        product_infos.append(product_info)
 
     title = "商品列表"
-    products = [
-        {
-            "name": "3080",
-            "brand": "ASUS",
-            "price": 1000,
-            "quantity": 5,
-            "image_url": "https://cdn.vox-cdn.com/thumbor/Y8HSRGJGLdHmQlIkOFoA-jUtBzA=/0x0:2640x1749/1200x800/filters:focal(1109x664:1531x1086)/cdn.vox-cdn.com/uploads/chorus_image/image/69746324/twarren_rtx3080.0.jpg",
-        },
-        {
-            "name": "3070",
-            "brand": "ROG",
-            "price": 800,
-            "quantity": 0,
-            "image_url": "https://cf.shopee.tw/file/e999d155a61197595757fa4945c589f9",
-        },
-        {
-            "name": "3060",
-            "brand": "ZOTAC",
-            "price": 600,
-            "quantity": 3,
-            "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZClI_bI7QUEtyZmPZs_VTx-DzQts0ScIs-g&usqp=CAU",
-        },
-    ]
     return render_template(
-        "search/products.html", title=title, products=products
+        "search/products.html", title=title, product_infos=product_infos
     )
 
 
