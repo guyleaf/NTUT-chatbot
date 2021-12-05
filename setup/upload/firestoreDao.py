@@ -83,7 +83,7 @@ class FirestoreDao:
 
             # pick one document randomly
             # similar to get hashed value and select bucket
-            document_id = random.randint(0, self._num_shards - 1)
+            document_id = random.randint(0, self._num_of_shards - 1)
             products_document = products_collection.document(str(document_id))
 
             items_collection = products_document.collection("items")
