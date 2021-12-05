@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Bootstrap CSS -->
+        <link
+            href="{{ url_for('static', filename='lib/css/bootstrap.min.css') }}"
+            rel="stylesheet"
+        />
+        <title>{{ title }}</title>
+    </head>
+    <body class="container">
+        <h1 class="mt-5 text-center">{{ title }}</h1>
+        <div class="input-group mt-3 mb-3">
+            <input
+                id="searchTextbox"
+                name="keyword"
+                type="text"
+                class="form-control"
+                placeholder="商品名稱"
+                aria-label="search_textbox"
+            />
+            <div class="input-group-append">
+                <button
+                    id="searchButton"
+                    class="btn btn-outline-secondary"
+                    type="button"
+                >
+                    搜尋商品
+                </button>
+            </div>
+        </div>
+        <div id="searchResult"></div>
+        <label id="userId" style="display: none">{{ user_id }}</label>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='js/search.js') }}"
+        ></script>
+    </body>
+</html>
