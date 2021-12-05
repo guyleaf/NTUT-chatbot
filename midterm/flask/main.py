@@ -4,7 +4,11 @@ from flask import Flask, render_template, request, abort, jsonify
 from flask.wrappers import Response
 
 from firestoreDAO import firestoreDAO
-from models import search_args_schema, my_favorites_action_schema
+from models import (
+    search_args_schema,
+    my_favorites_action_schema,
+    registration_schema,
+)
 from responses import (
     user_missing_message_for_view,
     user_not_found_message_for_view,
@@ -15,13 +19,29 @@ from responses import (
 app = Flask(__name__, static_folder="static")
 
 
+@app.route("/register", methods=["POST"])
+def register_user():
+    registration_info = request.get_json(force=True)
+    errors = registration_schema.validate(registration_info)
+
+    if errors:
+        return errors, 400
+
+    registration_info = registration_schema.load(registration_info)
+
+    if firestoreDAO.is_user_exists_by_line_id(registration_info["line_id"]):
+        return firestoreDAO.get_user(registration_info["line_id"])
+    else:
+        return firestoreDAO.register_user(registration_info)
+
+
 @app.route("/search", methods=["GET"])
 def get_search_page():
     user_id = request.args.get("user_id")
     if not user_id:
         abort(Response(user_missing_message_for_view, 400))
 
-    if not firestoreDAO.is_user_exists(user_id):
+    if not firestoreDAO.is_user_exists_by_id(user_id):
         abort(Response(user_not_found_message_for_view, 400))
 
     title = "商品搜尋"
@@ -39,7 +59,7 @@ def search_products():
     search_args = search_args_schema.load(search_args)
     user_id = search_args["user_id"]
 
-    if not firestoreDAO.is_user_exists(user_id):
+    if not firestoreDAO.is_user_exists_by_id(user_id):
         return {
             "success": False,
             "message": user_not_found_message_for_api,
@@ -76,7 +96,7 @@ def search_products():
 
 @app.route("/<user_id>/myFavorites", methods=["GET"])
 def get_my_favorite_page(user_id):
-    if not firestoreDAO.is_user_exists(user_id):
+    if not firestoreDAO.is_user_exists_by_id(user_id):
         abort(Response(user_not_found_message_for_view, 400))
 
     title = "我的最愛"
@@ -101,7 +121,7 @@ def add_favorite(user_id):
             "success": False,
             "message": product_not_found_message_for_api,
         }, 404
-    if not firestoreDAO.is_user_exists(user_id):
+    if not firestoreDAO.is_user_exists_by_id(user_id):
         return {
             "success": False,
             "message": user_not_found_message_for_api,
@@ -125,7 +145,7 @@ def delete_favorite(user_id):
 
     if not firestoreDAO.is_product_existed(product_id):
         return {"success": False, "message": "Unknown product id"}, 404
-    if not firestoreDAO.is_user_exists(user_id):
+    if not firestoreDAO.is_user_exists_by_id(user_id):
         return {"success": False, "message": "Unknown user id"}, 404
 
     firestoreDAO.delete_favorite(user_id, product_id)

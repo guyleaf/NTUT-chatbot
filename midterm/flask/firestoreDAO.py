@@ -35,9 +35,15 @@ class FirestoreDAO:
             .stream()
         )
 
-    def is_user_exists(self, user_id: str) -> bool:
+    def is_user_exists_by_id(self, user_id: str) -> bool:
         result = self._db.document(f"users/{user_id}").get()
         return result.exists
+
+    def is_user_exists_by_line_id(self, line_id: str) -> bool:
+        result = (
+            self._db.collection("users").where("line_id", "==", line_id).get()
+        )
+        return len(result) != 0
 
     def is_admin(self, user_id: str) -> bool:
         result = (
@@ -47,6 +53,21 @@ class FirestoreDAO:
             .get("is_admin", False)
         )
         return result
+
+    def register_user(self, registration_info: dict[str, Any]):
+        user_document = self._db.collection("users").document()
+        registration_info["id"] = user_document.id
+        registration_info["is_admin"] = False
+        registration_info["favorite_product_ids"] = []
+        user_document.create(registration_info)
+
+        return user_document.get().to_dict()
+
+    def get_user(self, line_id: str) -> dict[str, Any]:
+        result = (
+            self._db.collection("users").where("line_id", "==", line_id).get()
+        )
+        return next(result, None)
 
     # search / products
     def get_products_by_keyword(
