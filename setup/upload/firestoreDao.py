@@ -55,7 +55,7 @@ class FirestoreDao:
         return [document.to_dict() for document in documents]
 
     def _init_shards(self, collection):
-        for num in self._num_of_shards:
+        for num in range(self._num_of_shards):
             shard = Shard()
             collection.document(str(num)).set(shard.to_dict())
 
