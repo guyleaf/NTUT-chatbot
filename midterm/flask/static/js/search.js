@@ -28,6 +28,10 @@
                 console.error(error);
             });
     });
+    $("#scrollToTopButton").click(function (_) {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
 
     function addNewResults() {
         skip += take;
@@ -44,6 +48,7 @@
     }
 
     window.onscroll = function () {
+        scrollFunction("#scrollToTopButton");
         if (
             !isSearched ||
             skip + take >= total ||
@@ -55,6 +60,17 @@
         addNewResults();
     };
 });
+
+function scrollFunction(target) {
+    if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 20
+    ) {
+        $(target).show();
+    } else {
+        $(target).hide();
+    }
+}
 
 function getDocumentHeight() {
     const body = document.body;
