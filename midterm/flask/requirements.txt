@@ -1,0 +1,4 @@
+﻿flask
+firebase-admin
+line-bot-sdk
+marshmallow

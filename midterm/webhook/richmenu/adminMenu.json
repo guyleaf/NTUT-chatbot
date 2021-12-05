@@ -1,0 +1,73 @@
+{
+    "size": {
+        "width": 1200,
+        "height": 810
+    },
+    "selected": true,
+    "name": "adminMenu",
+    "chatBarText": "{} 購物管理主選單",
+    "areas": [
+        {
+            "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 800,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/search",
+                "data": "?user_id={}"
+            }
+        },
+        {
+            "bounds": {
+                "x": 800,
+                "y": 0,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/{}/myFavorite"
+            }
+        },
+        {
+            "bounds": {
+                "x": 0,
+                "y": 405,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/{}/orders"
+            }
+        },
+        {
+            "bounds": {
+                "x": 400,
+                "y": 405,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/{}/products"
+            }
+        },
+        {
+            "bounds": {
+                "x": 800,
+                "y": 405,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/report",
+                "data": "?user_id={}"
+            }
+        }
+    ]
+}
