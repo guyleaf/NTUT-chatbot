@@ -78,7 +78,7 @@ class FirestoreDAO:
         favorite_product_ids = self.get_favorite_product_ids(user_id)
         return self.get_products_by_ids(favorite_product_ids)
 
-    def add_favorite(self, user_id, product_id):
+    def add_favorite(self, user_id: str, product_id: str):
         user_document = self._db.document(f"users/{user_id}")
         user_document.update(
             {
@@ -88,7 +88,7 @@ class FirestoreDAO:
             }
         )
 
-    def delete_favorite(self, user_id, product_id):
+    def delete_favorite(self, user_id: str, product_id: str):
         user_document = self._db.document(f"users/{user_id}")
         user_document.update(
             {
@@ -102,22 +102,23 @@ class FirestoreDAO:
     def get_orders(self, user_id):
         orders = []
         if self.is_admin(user_id):
-            orders_col = self._db.collection("orders").stream()
-            orders = orders_col.to_dict()
+            orders_collection = self._db.collection("orders").stream()
+            orders = orders_collection.to_dict()
         else:
-            orders_col = (
+            orders_collection = (
                 self._db.collection("orders")
                 .where("user_id", "==", user_id)
                 .order_by("timestamp", direction=firestore.Query.DESCENDING)
                 .stream()
             )
-            for info in orders_col:
+            for info in orders_collection:
                 orders.append(info._data)
         return orders
 
     #
     def add_order(self, user_id, order_info):
         order_info["user_id"] = user_id
+        order_info["time"] = firestore.SERVER_TIMESTAMP
         self._db.collection("orders").add(order_info)
 
     # orderManagement
