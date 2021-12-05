@@ -65,8 +65,8 @@ def search_products():
 @app.route("/<user_id>/myFavorite", methods=["GET"])
 def get_my_favorite_page(user_id):
     title = "我的最愛"
-    my_favorites = firestoreDAO.get_favorites(user_id)
-    return render_template("myFavorite.html", **locals())
+    products = firestoreDAO.get_favorite_products(user_id)
+    return render_template("myFavorite.html", title=title, products=products)
 
 
 @app.route("/<user_id>/myFavorite", methods=["POST"])
