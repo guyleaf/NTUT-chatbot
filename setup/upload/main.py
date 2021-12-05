@@ -35,11 +35,6 @@ def init():
     firestore_dao.upload_products(products)
 
 
-def reset():
-    firestore_dao.clear_all()
-    init()
-
-
 def register():
     for user in admins:
         firestore_dao.add_user(user)
@@ -52,8 +47,6 @@ def main(request: flask.Request):
         register()
     elif request_args["action"] == "init":
         init()
-    elif request_args["action"] == "reset":
-        reset()
     else:
         return "400 Bad Request", 400
 
