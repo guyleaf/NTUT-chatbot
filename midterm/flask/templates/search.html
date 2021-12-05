@@ -11,44 +11,51 @@
         />
         <title>{{ title }}</title>
     </head>
-    <body class="container">
-        <h1 class="mt-5 text-center">{{ title }}</h1>
-        <div class="input-group mt-3 mb-3">
-            <input
-                id="searchTextbox"
-                name="keyword"
-                type="text"
-                class="form-control"
-                placeholder="商品名稱"
-                aria-label="search_textbox"
-            />
-            <div class="input-group-append">
-                <button
-                    id="searchButton"
-                    class="btn btn-outline-secondary"
-                    type="button"
-                >
-                    搜尋商品
-                </button>
+    <body>
+        <main class="container">
+            <h1 class="mt-5 text-center">{{ title }}</h1>
+            <div class="input-group mt-3 mb-3">
+                <input
+                    id="searchTextbox"
+                    name="keyword"
+                    type="text"
+                    class="form-control"
+                    placeholder="商品名稱"
+                    aria-label="search_textbox"
+                />
+                <div class="input-group-append">
+                    <button
+                        id="searchButton"
+                        class="btn btn-outline-secondary"
+                        type="button"
+                    >
+                        搜尋商品
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <div id="searchResult" style="display: none">
-            <h4>商品列表</h4>
-            <div class="row row-cols-1 row-cols-sm-2 g-2 results"></div>
-            <button
-                id="scrollToTopButton"
-                title="scroll to top"
-                class="
-                    btn btn-outline-secondary
-                    position-fixed
-                    bottom-20
-                    start-30
-                "
-            >
-                🠕
-            </button>
-        </div>
+            <div id="searchResult" style="display: none">
+                <h4>商品列表</h4>
+                <div class="row row-cols-1 row-cols-sm-2 g-2 results"></div>
+            </div>
+        </main>
+        <button
+            id="scrollToTopButton"
+            title="scroll to top"
+            class="
+                btn btn-secondary
+                position-fixed
+                bottom-0
+                start-0
+                mb-3
+                ms-3
+                fs-2
+            "
+            style="display: none"
+        >
+            🠕
+        </button>
+
         <label id="userId" style="display: none">{{ user_id }}</label>
         <script
             type="text/javascript"
