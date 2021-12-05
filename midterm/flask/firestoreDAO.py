@@ -5,13 +5,15 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "firestoreServiceAccount.json"
 
 
 class FirestoreDAO:
+    _db: firestore.firestore.Client
+
     def __init__(self):
         initialize_app()
         self._db = firestore.client()
 
     def get_role(self, user_id):
-        user = self._db.document(f"users/{user_id}")
-        return user.role
+        user = self._db.document(f"users/{user_id}").get()
+        return user.to_dict()
 
     # myFavorite
     def get_favorites(self, user_id):
@@ -20,21 +22,30 @@ class FirestoreDAO:
         return favorites_col.get().to_dict()
 
     # search_result / stockManagement
-    def get_products(self, user_id, keyword=None):
+    def get_products(
+        self, user_id: str, skip: int, take: int, keyword: str = None
+    ):
         products = []
         if keyword:  # search
-            products_col = (
+            products_collection = (
                 self._db.collection("orders")
-                .where(keyword, "in", "name")
+                .where("name", ">=", keyword)
+                .where("name", "<=", keyword + "\uf8ff")
+                .offset(skip)
+                .limit(take)
                 .order_by("name")
-                .stream()
+                .get()
             )
-            products = products_col.to_dict()
-            # for info in products_col:
-            #    products.append(info)
-        elif self.getRole(user_id) == "admin":
-            products_col = self._db.collection("orders").stream()
-            products = products_col.to_dict()
+            products = products_collection.to_dict()
+        elif self.get_role(user_id)[""] == "admin":
+            products_collection = (
+                self._db.collection("orders")
+                .offset(skip)
+                .limit(take)
+                .order_by("id")
+                .get()
+            )
+            products = products_collection.to_dict()
         return products
 
     # orderRecord, orderManagement
