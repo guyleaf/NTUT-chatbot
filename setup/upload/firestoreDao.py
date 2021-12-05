@@ -86,7 +86,7 @@ class FirestoreDao:
             document_id = random.randint(0, self._num_of_shards - 1)
             products_document = products_collection.document(str(document_id))
 
-            items_collection = products_document.collection("items")
+            items_collection = products_document.collection("product_items")
             items_document = items_collection.document(product["id"])
             batch_action.create(items_document, product)
 
