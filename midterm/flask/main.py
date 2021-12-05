@@ -34,7 +34,7 @@ def search_products():
         abort(Response("未知的使用者 ID", 400))
 
     favorite_product_ids = firestoreDAO.get_favorite_product_ids(user_id)
-    products = firestoreDAO.get_products_by_keyword(
+    total, products = firestoreDAO.get_products_by_keyword(
         search_args["skip"], search_args["take"], search_args["keyword"]
     )
 
@@ -55,7 +55,10 @@ def search_products():
 
     title = "商品列表"
     return render_template(
-        "search/products.html", title=title, product_infos=product_infos
+        "search/products.html",
+        title=title,
+        product_infos=product_infos,
+        total=total,
     )
 
 

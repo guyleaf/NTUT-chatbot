@@ -23,7 +23,10 @@ class FirestoreDAO:
         else:
             query = products_collection
 
-        return query.offset(skip).limit(take).order_by("name").stream()
+        return (
+            query.stream(),
+            query.offset(skip).limit(take).order_by("name").stream(),
+        )
 
     def _get_products_stream_by_ids(self, product_ids: list[str]):
         return (
@@ -49,8 +52,12 @@ class FirestoreDAO:
     def get_products_by_keyword(
         self, skip: int, take: int, keyword: str = None
     ):
-        results = self._get_products_stream_by_keyword(keyword, skip, take)
-        return [product.to_dict() for product in results]
+        total, results = self._get_products_stream_by_keyword(
+            keyword, skip, take
+        )
+        return sum(1 for _ in total), [
+            product.to_dict() for product in results
+        ]
 
     def get_products_by_ids(
         self, product_ids: list[str]
