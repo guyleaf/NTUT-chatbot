@@ -28,7 +28,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form>
+            <form action="/addProduct" method="POST">
               <div class="form-group">
                 <label for="name">商品名稱</label>
                 <input type="text" class="form-control" id="nameInput" placeholder="商品名稱">
@@ -62,8 +62,6 @@
         </div>
       </div>
     </div>
-
-
     <div class="card-deck">
         {% for product in response.products %}
         <div class="card" >
@@ -95,14 +93,23 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <div class="name">{{product.name}}</div>
-                        <div class="brand">品牌：{{product.brand}}</div>
-                        <div class="price">價格：{{product.price}}</div>
-                        <div class="quantity">剩餘數量：{{product.quantity}}</div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Save changes</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <form action="/updateProduct" method="POST">
+                          <div class="form-group">
+                            <label for="name">商品名稱：</label>
+                            <input type="text" class="form-control" id="nameInput" placeholder="{{product.name}}">
+                          </div>
+                          <div class="form-group">
+                            <label for="price">價格：</label>
+                            <input type="text" class="form-control" id="priceInput" placeholder="{{product.price}}">
+                          </div>
+                          <div class="form-group">
+                            <label for="quantity">剩餘數量：</label>
+                            <input type="text" class="form-control" id="quantityInput" placeholder="{{product.quantity}}">
+                          </div>
+                          <div class="mt-3"></div>
+                          <button type="submit" class="btn btn-primary">Submit</button>
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -161,7 +168,6 @@
                     </div>
                   </div>
                 </div>
-                
               </div>
             </div>
         </div>
