@@ -17,17 +17,11 @@ from messages import (
 
 class DialogflowHandler:
     def _register_user(self, line_id: str, user_name: str):
-        # request_body = {"lineId": line_id, "name": user_name}
-        # # TODO: Add auth api key
-        # response = requests.post(web_url + "/register", json=request_body)
-        # user = json.loads(response.content)
-        return {
-            "id": "123456789",
-            "line_id": line_id,
-            "name": user_name,
-            "role_id": "5",
-            "favorite_product_ids": [],
-        }, 200
+        request_body = {"line_id": line_id, "name": user_name}
+        # TODO: Add auth api key
+        response = requests.post(web_url + "/register", json=request_body)
+        user = json.loads(response.content)
+        return user, 200
 
     def _handle_register_action(self, response: dict[str, Any], line_id: str):
         user_name = response["parameters"]["person"]["name"]
