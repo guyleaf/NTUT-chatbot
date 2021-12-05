@@ -7,28 +7,15 @@ from settings import admins
 
 
 def init():
-    with open("./code.json", "r", encoding="utf-8") as f:
-        codes = json.load(f)
-
-    firestore_dao.upload_code_data(codes)
-
     with open("./product.json", "r", encoding="utf-8") as f:
         products = json.load(f)
-
-    code_names = ["現貨", "缺貨中"]
-    codes = firestore_dao.get_product_status_codes(code_names)
-
-    def find_code(name: str) -> Optional[dict[str, Any]]:
-        for code in codes:
-            if code["name"] == name:
-                return code
-        return None
 
     for product in products:
         status_name = product["status"]
         product["status"] = {
             "quantity": product["quantity"],
-            "status_id": find_code(status_name)["id"],
+            "is_available": status_name != "已下架" and status_name != "已刪除",
+            "is_deleted": status_name == "已刪除",
         }
         del product["quantity"]
 
