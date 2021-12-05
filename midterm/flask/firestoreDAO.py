@@ -11,9 +11,11 @@ class FirestoreDAO:
         initialize_app()
         self._db = firestore.client()
 
-    def get_role(self, user_id):
-        user = self._db.document(f"users/{user_id}").get()
-        return user.to_dict()
+    def get_role_name(self, user_id):
+        user = self._db.document(f"users/{user_id}").get().to_dict()
+        role_id = user["role_id"]
+        code = self._db.document(f"codes/{role_id}").get().to_dict()
+        return code["name"]
 
     # myFavorite
     def get_favorites(self, user_id):
@@ -25,19 +27,13 @@ class FirestoreDAO:
     def get_products(
         self, user_id: str, skip: int, take: int, keyword: str = None
     ):
-        products = []
+        orders_collection = self._db.collection("products")
         if keyword:  # search
-            products_collection = (
-                self._db.collection("orders")
-                .where("name", ">=", keyword)
-                .where("name", "<=", keyword + "\uf8ff")
-                .offset(skip)
-                .limit(take)
-                .order_by("name")
-                .get()
+            query = orders_collection.where("name", ">=", keyword).where(
+                "name", "<=", keyword + "\uf8ff"
             )
             products = products_collection.to_dict()
-        elif self.get_role(user_id)[""] == "admin":
+        else:
             products_collection = (
                 self._db.collection("orders")
                 .offset(skip)
