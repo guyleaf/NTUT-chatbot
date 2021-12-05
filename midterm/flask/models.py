@@ -13,4 +13,9 @@ class SearchArgsSchema(Pagination):
     keyword = fields.String(required=True)
 
 
+class MyFavoritesActionSchema(Schema):
+    product_id = fields.String(required=True, validate=validate.Length(min=5))
+
+
 search_args_schema = SearchArgsSchema()
+my_favorites_action_schema = MyFavoritesActionSchema()

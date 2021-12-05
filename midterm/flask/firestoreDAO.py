@@ -78,6 +78,14 @@ class FirestoreDAO:
         favorite_product_ids = self.get_favorite_product_ids(user_id)
         return self.get_products_by_ids(favorite_product_ids)
 
+    def is_product_existed(self, product_id: str) -> bool:
+        products_collection = (
+            self._db.collection_group("product_items")
+            .where("id", "==", product_id)
+            .get()
+        )
+        return len(products_collection) == 1
+
     def add_favorite(self, user_id: str, product_id: str):
         user_document = self._db.document(f"users/{user_id}")
         user_document.update(

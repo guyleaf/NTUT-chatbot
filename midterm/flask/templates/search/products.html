@@ -1,7 +1,6 @@
 {% if product_infos|length == 0 %}
 <label class="text-center text-muted fw-bold">查無商品資料</label>
-{% endif %} 
-{% for product_info in product_infos %}
+{% endif %} {% for product_info in product_infos %}
 <div class="col">
     <div class="card">
         <img
@@ -18,12 +17,30 @@
                     剩餘數量：{{ product_info.product.status.quantity }}
                 </div>
             </div>
-            <button type="button" class="btn btn-primary">購買</button>
-            {% if product_info.is_favorite %}
-            <button type="button" class="btn btn-danger">移除最愛</button>
-            {% else %}
-            <button type="button" class="btn btn-danger">加入最愛</button>
-            {% endif %}
+            <button
+                type="button"
+                class="btn btn-primary purchaseButton"
+                data-product-id="{{ product_info.product.id }}"
+            >
+                購買
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-danger deleteFavoriteButton"
+                data-product-id="{{ product_info.product.id }}"
+                style="display: {{ block if product_info.is_favorite else none }}"
+            >
+                移除最愛
+            </button>
+            <button
+                type="button"
+                class="btn btn-danger addFavoriteButton"
+                data-product-id="{{ product_info.product.id }}"
+                style="display: {{ none if product_info.is_favorite else block }}"
+            >
+                加入最愛
+            </button>
         </div>
     </div>
 </div>
