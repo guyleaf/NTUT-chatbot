@@ -14,6 +14,7 @@ from responses import (
     user_not_found_message_for_view,
     user_not_found_message_for_api,
     product_not_found_message_for_api,
+    service_exception_message,
 )
 
 app = Flask(__name__, static_folder="static")
@@ -30,9 +31,16 @@ def register_user():
     registration_info = registration_schema.load(registration_info)
 
     if firestoreDAO.is_user_exists_by_line_id(registration_info["line_id"]):
-        return firestoreDAO.get_user(registration_info["line_id"])
+        user = firestoreDAO.get_user(registration_info["line_id"])
     else:
-        return firestoreDAO.register_user(registration_info)
+        user = firestoreDAO.register_user(registration_info)
+
+    if not user:
+        return {
+            "success": False,
+            "message": service_exception_message,
+        }, 500
+    return user
 
 
 @app.route("/search", methods=["GET"])
