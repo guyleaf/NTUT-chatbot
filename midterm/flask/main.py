@@ -26,7 +26,7 @@ def register_user():
     errors = registration_schema.validate(registration_info)
 
     if errors:
-        return jsonify(errors), 400
+        return errors, 400
 
     registration_info = registration_schema.load(registration_info)
 
@@ -37,17 +37,14 @@ def register_user():
 
     if not user:
         return (
-            jsonify(
-                {
-                    "success": False,
-                    "message": service_exception_message,
-                }
-            ),
+            {
+                "success": False,
+                "message": service_exception_message,
+            },
             500,
         )
 
-    print(user)
-    return jsonify(user)
+    return user
 
 
 @app.route("/search", methods=["GET"])
