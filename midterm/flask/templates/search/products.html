@@ -1,24 +1,48 @@
-<h4>{{ title }}</h4>
-<div class="row row-cols-1 row-cols-sm-2 g-2">
-    {% for product in products %}
-    <div class="col">
-        <div class="card">
-            <img
-                class="card-img-top img-thumbnail"
-                src="{{ product.image_url }}"
-                alt="Card image cap"
-            />
-            <div class="card-body">
-                <h5 class="card-title mt-3">{{ product.name }}</h5>
-                <div class="mb-3 card-info">
-                    <div class="brand">品牌：{{ product.brand }}</div>
-                    <div class="price">價格：{{ product.price }}</div>
-                    <div class="quantity">剩餘數量：{{ product.quantity }}</div>
+{% if product_infos|length == 0 %}
+<label class="text-center text-muted fw-bold">查無商品資料</label>
+{% endif %} {% for product_info in product_infos %}
+<div class="col">
+    <div class="card">
+        <img
+            class="card-img-top img-thumbnail"
+            src="{{ product_info.product.image_url }}"
+            alt="Card image cap"
+        />
+        <div class="card-body">
+            <h5 class="card-title mt-3">{{ product_info.product.name }}</h5>
+            <div class="mb-3 card-info">
+                <div class="brand">品牌：{{ product_info.product.brand }}</div>
+                <div class="price">價格：{{ product_info.product.price }}</div>
+                <div class="quantity">
+                    剩餘數量：{{ product_info.product.status.quantity }}
                 </div>
-                <button type="button" class="btn btn-primary">購買</button>
-                <button type="button" class="btn btn-danger">加入最愛</button>
             </div>
+            <button
+                type="button"
+                class="btn btn-primary purchaseButton"
+                data-product-id="{{ product_info.product.id }}"
+            >
+                購買
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-danger deleteFavoriteButton"
+                data-product-id="{{ product_info.product.id }}"
+                style="display: {{ block if product_info.is_favorite else none }}"
+            >
+                移除最愛
+            </button>
+            <button
+                type="button"
+                class="btn btn-danger addFavoriteButton"
+                data-product-id="{{ product_info.product.id }}"
+                style="display: {{ none if product_info.is_favorite else block }}"
+            >
+                加入最愛
+            </button>
         </div>
     </div>
-    {% endfor %}
 </div>
+{% endfor %}
+<label class="total" style="display: none">{{ total }}</label>

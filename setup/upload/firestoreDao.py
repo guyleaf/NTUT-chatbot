@@ -86,7 +86,7 @@ class FirestoreDao:
             document_id = random.randint(0, self._num_of_shards - 1)
             products_document = products_collection.document(str(document_id))
 
-            items_collection = products_document.collection("items")
+            items_collection = products_document.collection("product_items")
             items_document = items_collection.document(product["id"])
             batch_action.create(items_document, product)
 
@@ -96,24 +96,20 @@ class FirestoreDao:
 
         batch_action.commit()
 
-    def clear_all(self):
-        batch_action = self._db.batch()
-        codes_collection = self._db.collection(u"codes")
-        products_collection = self._db.collection(u"products")
-
-        for product in products_collection.stream():
-            batch_action.delete(product.reference)
-
-        for code in codes_collection.stream():
-            batch_action.delete(code.reference)
-
-        batch_action.commit()
-
     def add_user(self, user: dict[str, Any]):
         user_document = self._db.collection(u"users").document()
 
         user["id"] = user_document.id
         user_document.create(user)
+
+    def clear_user(self):
+        batch_action = self._db.batch()
+        users_collection = self._db.collection(u"users").stream()
+
+        for document in users_collection:
+            batch_action.delete(document.reference)
+
+        batch_action.commit()
 
 
 firestore_dao = FirestoreDao()
