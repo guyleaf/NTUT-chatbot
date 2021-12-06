@@ -29,7 +29,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/{}/myFavorite"
+                "uri": "/{}/myFavorites"
             }
         },
         {
