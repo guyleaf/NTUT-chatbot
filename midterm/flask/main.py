@@ -26,7 +26,7 @@ def register_user():
     errors = registration_schema.validate(registration_info)
 
     if errors:
-        return errors, 400
+        return jsonify(errors), 400
 
     registration_info = registration_schema.load(registration_info)
 
@@ -36,11 +36,18 @@ def register_user():
         user = firestoreDAO.register_user(registration_info)
 
     if not user:
-        return {
-            "success": False,
-            "message": service_exception_message,
-        }, 500
-    return user
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": service_exception_message,
+                }
+            ),
+            500,
+        )
+
+    print(user)
+    return jsonify(user)
 
 
 @app.route("/search", methods=["GET"])

@@ -67,7 +67,7 @@ class FirestoreDAO:
         result = (
             self._db.collection("users").where("line_id", "==", line_id).get()
         )
-        return next(result, None)
+        return next(iter(result)).to_dict()
 
     # search / products
     def get_products_by_keyword(
