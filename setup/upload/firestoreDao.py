@@ -102,5 +102,14 @@ class FirestoreDao:
         user["id"] = user_document.id
         user_document.create(user)
 
+    def clear_user(self):
+        batch_action = self._db.batch()
+        users_collection = self._db.collection(u"users").stream()
+
+        for document in users_collection:
+            batch_action.delete(document.reference)
+
+        batch_action.commit()
+
 
 firestore_dao = FirestoreDao()

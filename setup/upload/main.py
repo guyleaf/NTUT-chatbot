@@ -23,6 +23,7 @@ def init():
 
 
 def register():
+    firestore_dao.clear_user()
     for user in admins:
         firestore_dao.add_user(user)
 
