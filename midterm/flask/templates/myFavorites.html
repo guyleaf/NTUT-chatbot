@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Bootstrap CSS -->
+        <link
+            href="{{ url_for('static', filename='lib/css/bootstrap.min.css') }}"
+            rel="stylesheet"
+        />
+        <title>{{title}}</title>
+    </head>
+    <body>
+        <main class="container">
+            <h1 class="mt-5 text-center">{{ title }}</h1>
+            {% if products|length == 0 %}
+            <label class="text-center text-muted fw-bold">無最愛商品資料</label>
+            {% endif %}
+            <div class="row row-cols-1 row-cols-sm-3 g-2 results">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card">
+                        <img
+                            class="card-img-top img-thumbnail"
+                            src="{{ product.image_url }}"
+                            alt="Card image cap"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title mt-3">{{ product.name }}</h5>
+                            <div class="mb-3 card-info">
+                                <div class="brand">
+                                    品牌：{{ product.brand }}
+                                </div>
+                                <div class="price">
+                                    價格：{{ product.price }}
+                                </div>
+                                <div class="quantity">
+                                    剩餘數量：{{ product.status.quantity }}
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary">
+                                購買
+                            </button>
+                            <button type="button" class="btn btn-danger">
+                                移除最愛
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <label id="userId" style="display: none">{{ user_id }}</label>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='js/???.js') }}"
+        ></script>
+    </body>
+</html>
