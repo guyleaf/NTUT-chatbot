@@ -12,10 +12,20 @@
         <title>{{title}}</title>
     </head>
     <body>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
+        ></script>
         <main class="container">
             <h1 class="mt-5 text-center">{{ title }}</h1>
             {% if products|length == 0 %}
-            <label class="text-center text-muted fw-bold">無最愛商品資料</label>
+            <div class="text-center text-muted fw-bold mt-5">
+                尚未加入任何我的最愛商品
+            </div>
             {% endif %}
             <div class="row row-cols-1 row-cols-sm-3 g-2 results">
                 {% for product in products %}
@@ -39,10 +49,19 @@
                                     剩餘數量：{{ product.status.quantity }}
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-primary">
+                            <button
+                                type="button"
+                                class="btn btn-primary purchaseButton"
+                                data-product-id="{{ product.id }}"
+                            >
                                 購買
                             </button>
-                            <button type="button" class="btn btn-danger">
+
+                            <button
+                                type="button"
+                                class="btn btn-danger deleteFavoriteButton"
+                                data-product-id="{{ product.id }}"
+                            >
                                 移除最愛
                             </button>
                         </div>
@@ -53,17 +72,41 @@
         </main>
 
         <label id="userId" style="display: none">{{ user_id }}</label>
+        <div id="deleteFavoriteSuccessHint" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">我的最愛</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>移除成功</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script
             type="text/javascript"
-            src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
+            src="{{ url_for('static', filename='js/favorite.js') }}"
         ></script>
         <script
             type="text/javascript"
-            src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
-        ></script>
-        <script
-            type="text/javascript"
-            src="{{ url_for('static', filename='js/???.js') }}"
+            src="{{ url_for('static', filename='js/myFavorites.js') }}"
         ></script>
     </body>
 </html>

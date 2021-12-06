@@ -97,7 +97,11 @@ class FirestoreDAO:
     # myFavorites
     def get_favorite_products(self, user_id: str) -> list[dict[str, Any]]:
         favorite_product_ids = self.get_favorite_product_ids(user_id)
-        return self.get_products_by_ids(favorite_product_ids)
+        return (
+            self.get_products_by_ids(favorite_product_ids)
+            if len(favorite_product_ids) != 0
+            else []
+        )
 
     def is_product_existed(self, product_id: str) -> bool:
         products_collection = (
