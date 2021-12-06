@@ -113,7 +113,7 @@ def get_my_favorite_page(user_id):
 
     title = "我的最愛"
     products = firestoreDAO.get_favorite_products(user_id)
-    return render_template("myFavorite.html", title=title, products=products)
+    return render_template("myFavorites.html", title=title, products=products)
 
 
 @app.route("/<user_id>/myFavorites", methods=["POST"])
