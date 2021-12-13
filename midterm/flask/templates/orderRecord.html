@@ -36,7 +36,7 @@
           {% for order in orders %}
           <tbody>
             <tr>
-              <th class="date">{{order.date}}</th>
+              <th class="date">{{order.timestamp}}</th>
               <td class="name">{{order.name}}</td>
               <td class="price">{{order.price}}</td>
               <td class="quantity">{{order.status.quantity}}</td>
@@ -56,7 +56,7 @@
     <label id="userId" style="display: none">{{ user_id }}</label>
     <script
           type="text/javascript"
-          src="{{ url_for('static', filename='js/orderRecord.js') }}"
+          src="{{ url_for('static', filename='js/table.js') }}"
       ></script>
   </body>
 </html>
