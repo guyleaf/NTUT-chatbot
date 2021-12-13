@@ -107,6 +107,16 @@ def search_products():
     )
 
 
+@app.route("/products/<product_id>", methods=["GET"])
+def get_product_page(product_id):
+    pass
+
+
+@app.route("/products/<product_id>", methods=["POST"])
+def purchase_product(product_id):
+    pass
+
+
 @app.route("/<user_id>/myFavorites", methods=["GET"])
 def get_my_favorite_page(user_id):
     if not firestoreDAO.is_user_exists_by_id(user_id):
