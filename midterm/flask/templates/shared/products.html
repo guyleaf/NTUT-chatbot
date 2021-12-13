@@ -1,0 +1,85 @@
+{% for product_info in product_infos %}
+{% set product_status = product_info.product.status %}
+{% set can_buy = not product_status.is_deleted and product_status.is_available and product_status.quantity > 0 %}
+<div class="col">
+    <div class="card">
+        <img
+            class="card-img-top img-thumbnail"
+            src="{{ product_info.product.image_url }}"
+            alt="Card image cap"
+            style="opacity: {{ 0.5 if not can_buy else 1 }}"
+        />
+        <div class="card-body">
+            <h5 class="card-title mt-3">{{ product_info.product.name }}</h5>
+            <div class="mb-3 card-info">
+                <div class="brand">品牌：{{ product_info.product.brand }}</div>
+                <div class="price">價格：{{ product_info.product.price }}</div>
+                {% if product_status.is_deleted %}
+                    <label class="fw-bold text-danger">此商品已刪除</label>
+                {% elif product_status.is_available %}
+                    <div class="quantity">
+                        剩餘數量：
+                    {% if product_status.quantity > 0 %}
+                        <label class="fw-bold text-success">{{ product_status.quantity }}</label>
+                    {% else %}
+                        <label class="fw-bold text-danger">缺貨中</label>
+                    {% endif %}
+                    </div>
+                {% else %}
+                    <label class="fw-bold text-danger">已下架</label>
+                {% endif %}
+            </div>
+
+            {% if can_buy %}
+                <button
+                    type="button"
+                    class="btn btn-primary purchaseButton"
+                    data-product-id="{{ product_info.product.id }}"
+                >
+                    購買
+                </button>
+            {% else %}
+                <button
+                    type="button"
+                    class="btn btn-primary purchaseButton"
+                    data-product-id="{{ product_info.product.id }}"
+                    disabled
+                >
+                    無法購買
+                </button>
+            {% endif %}
+
+            <button
+                type="button"
+                class="btn btn-danger deleteFavoriteButton"
+                data-product-id="{{ product_info.product.id }}"
+                style="display: {{ block if product_info.is_favorite else none }}"
+            >
+                移除最愛
+            </button>
+
+            {% if product_status.is_deleted %}
+                <button
+                    type="button"
+                    class="btn btn-danger addFavoriteButton"
+                    data-product-id="{{ product_info.product.id }}"
+                    style="display: {{ none if product_info.is_favorite else block }}"
+                    disabled
+                >
+                    加入最愛
+                </button>
+            {% else %}
+                <button
+                    type="button"
+                    class="btn btn-danger addFavoriteButton"
+                    data-product-id="{{ product_info.product.id }}"
+                    style="display: {{ none if product_info.is_favorite else block }}"
+                >
+                    加入最愛
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+<label class="total" style="display: none">{{ total }}</label>

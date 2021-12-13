@@ -15,8 +15,13 @@ class FirestoreDAO:
     def _get_products_stream_by_keyword(
         self, keyword: str, skip: int, take: int
     ):
-        products_collection = self._db.collection_group("product_items")
-        if keyword:
+        products_collection = (
+            self._db.collection_group("product_items")
+            .where("status.is_available", "==", True)
+            .where("status.is_deleted", "==", False)
+        )
+
+        if len(keyword) != 0:
             query = products_collection.where("name", ">=", keyword).where(
                 "name", "<=", keyword + "\uf8ff"
             )
@@ -147,28 +152,26 @@ class FirestoreDAO:
             for info in orders_collection:
                 orders.append(info._data)
         return orders
-    
-    def is_order_existed(self, order_id: str) -> bool: #Ron wrote
+
+    def is_order_existed(self, order_id: str) -> bool:  # Ron wrote
         order_collection = (
             self._db.collection_group("orders")
             .where("id", "==", order_id)
             .get()
         )
         return len(order_collection) == 1
+
     #
-    def add_order(self, user_id: str, order_info: dict): #Ron wrote
+    def add_order(self, user_id: str, order_info: dict):  # Ron wrote
         order_info["user_id"] = user_id
         order_info["timestamp"] = firestore.SERVER_TIMESTAMP
         self._db.collection("orders").add(order_info)
 
     # orderManagement
-    def update_order(self, order_info): #Ron wrote
+    def update_order(self, order_info):  # Ron wrote
         order_id = order_info["order_id"]
         order_doc = self._db.document(f"orders/{order_id}")
         order_doc.set(order_info)
-
-
-
 
     # stockManagement
     def add_product(self, product_info):

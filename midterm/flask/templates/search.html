@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5 text-center">{{ title }}</h1>
-    <div class="input-group mt-3 mb-3">
+    <form id="searchForm" class="input-group mt-3 mb-3" action="javascript:void(0);">
         <input
             id="searchTextbox"
             name="keyword"
@@ -15,14 +15,15 @@
         <button
             id="searchButton"
             class="btn btn-outline-secondary"
-            type="button"
+            type="submit"
         >
             搜尋商品
         </button>
-    </div>
+    </form>
 
     <div id="searchResult" style="display: none">
         <h4>商品列表</h4>
+        <p id="resultsNotFoundMessage" class="text-center text-muted fw-bold" style="display: none">查無商品資料</p>
         <div class="row row-cols-1 row-cols-sm-3 g-2 results"></div>
     </div>
 </div>
@@ -37,61 +38,7 @@
 
 <label id="userId" style="display: none">{{ user_id }}</label>
 
-<div id="addFavoriteSuccessHint" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">我的最愛</h5>
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <p>加入我的最愛成功</p>
-            </div>
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    data-bs-dismiss="modal"
-                >
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="deleteFavoriteSuccessHint" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">我的最愛</h5>
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <p>移除成功</p>
-            </div>
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    data-bs-dismiss="modal"
-                >
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+{% include "shared/favoriteModals.html" %}
 {% endblock %}
 
 {% block scripts %}

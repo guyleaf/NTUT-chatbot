@@ -100,7 +100,7 @@ def search_products():
 
     title = "商品列表"
     return render_template(
-        "search/products.html",
+        "shared/products.html",
         title=title,
         product_infos=product_infos,
         total=total,
@@ -114,8 +114,17 @@ def get_my_favorite_page(user_id):
 
     title = "我的最愛"
     products = firestoreDAO.get_favorite_products(user_id)
+
+    product_infos = [
+        {"is_favorite": True, "product": product} for product in products
+    ]
+
     return render_template(
-        "myFavorites.html", title=title, products=products, user_id=user_id
+        "myFavorites.html",
+        title=title,
+        product_infos=product_infos,
+        total=len(product_infos),
+        user_id=user_id,
     )
 
 
@@ -180,23 +189,20 @@ def get_order_page(user_id):
     )
 
 
-@app.route("/<user_id>/orders", methods=["PUT"]) #Ron wrote
+@app.route("/<user_id>/orders", methods=["PUT"])  # Ron wrote
 def update_order(user_id):
     body = request.get_json(force=True)
-    errors = update_order_action_schema.validate(body) #Don't know how to do
+    errors = update_order_action_schema.validate(body)  # Don't know how to do
 
     if errors:
         return errors, 400
 
-    body = update_order_action_schema.load(body) #Don't know how to do
-    
+    body = update_order_action_schema.load(body)  # Don't know how to do
+
     order_id = body["order_id"]
     state = body["state"]
-    order_info = {
-        "id"    : order_id,
-        "state" : state #state:-1 處理中, 0 運送中 , 1已完成
-    }
-    
+    order_info = {"id": order_id, "state": state}  # state:-1 處理中, 0 運送中 , 1已完成
+
     if not firestoreDAO.is_order_existed(order_id):
         return {
             "success": False,
@@ -207,29 +213,29 @@ def update_order(user_id):
             "success": False,
             "message": user_not_found_message_for_api,
         }, 404
-    
+
     firestoreDAO.update_order(user_id, order_info)
     return jsonify("更新訂單成功")
 
 
-@app.route("/<user_id>/orders", methods=["POST"]) #Ron wrote
+@app.route("/<user_id>/orders", methods=["POST"])  # Ron wrote
 def add_order(user_id):
     body = request.get_json(force=True)
-    errors = add_order_action_schema.validate(body) #Don't know how to do
+    errors = add_order_action_schema.validate(body)  # Don't know how to do
 
     if errors:
         return errors, 400
 
-    body = add_order_action_schema.load(body) #Don't know how to do
-    
+    body = add_order_action_schema.load(body)  # Don't know how to do
+
     product_id = body["product_id"]
     quantity = body["quantity"]
     order_info = {
-        "product_id" : product_id,
-        "quantity"   : quantity,
-        "state"      : -1 #state:-1 處理中, 0 運送中 , 1已完成
+        "product_id": product_id,
+        "quantity": quantity,
+        "state": -1,  # state:-1 處理中, 0 運送中 , 1已完成
     }
-    
+
     if not firestoreDAO.is_product_existed(product_id):
         return {
             "success": False,
@@ -240,12 +246,13 @@ def add_order(user_id):
             "success": False,
             "message": user_not_found_message_for_api,
         }, 404
-    
+
     firestoreDAO.add_order(user_id, order_info)
     return jsonify("新增訂單成功")
 
+
 # seller
-@app.route("/<user_id>/products", methods=["GET"]) 
+@app.route("/<user_id>/products", methods=["GET"])
 def manage_products(user_id):
     title = "商品管理"
     produtcts = firestoreDAO.get_products(user_id)

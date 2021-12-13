@@ -1,99 +1,118 @@
 ﻿$(function () {
-    let isSearched = false;
-    const userId = $("#userId").text();
-    let keyword;
+  let isSearched = false;
+  const userId = $("#userId").text();
+  let keyword;
 
-    let skip = 0;
-    const take = 10;
+  const spinner = new Spin.Spinner().spin();
 
-    let body = {
-        user_id: userId,
-        keyword: keyword,
-        skip: skip,
-        take: take,
-    };
-    let total = -1;
+  const take = 10;
 
-    $("#searchButton").click(function (e) {
-        e.preventDefault();
-        keyword = $("#searchTextbox").val();
-        body["keyword"] = keyword;
-        $.post("search", JSON.stringify(body))
-            .done(function (data) {
-                $("#searchResult > .results").html(data);
-                $("#searchResult").show();
-                total = parseInt($(".total").last().text());
-                setupFavoriteFunction(userId);
-                isSearched = true;
-            })
-            .fail(function (error) {
-                console.error(error);
-            });
-    });
-    $("#scrollToTopButton").click(function (e) {
-        e.preventDefault();
-        document.body.scrollTop = 0; // For Safari
-        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    });
+  let requestBody = {
+    user_id: userId,
+    keyword: keyword,
+    skip: 0,
+    take: take,
+  };
+  let total = -1;
 
-    function addNewResults() {
-        skip += take;
-        body["skip"] = skip;
+  $("#searchForm").submit(function (e) {
+    e.preventDefault();
+    reset();
+    $("#searchResult").show();
+    $("#resultsNotFoundMessage").hide();
+    $("#searchResult > .results").html(spinner.el);
 
-        $.post("search", JSON.stringify(body))
-            .done(function (data) {
-                $("#searchResult > .results").append(data);
-                total = parseInt($(".total").last().text());
-            })
-            .fail(function (error) {
-                console.error(error);
-            });
-    }
+    keyword = $("#searchTextbox").val();
+    requestBody["keyword"] = keyword;
 
-    window.onscroll = function () {
-        scrollFunction("#scrollToTopButton");
-        if (
-            !isSearched ||
-            skip + take >= total ||
-            getScrollTop() < getDocumentHeight() - window.innerHeight
-        ) {
-            return;
+    $.post("search", JSON.stringify(requestBody))
+      .done(function (data) {
+        $("#searchResult > .results").html(data);
+
+        total = getTotal();
+        if (total === 0) {
+          $("#resultsNotFoundMessage").show();
         }
 
-        addNewResults();
-    };
-});
+        setupFavoriteFunction(userId);
+        isSearched = true;
+      })
+      .fail(function (error) {
+        console.error(error);
+      });
+  });
 
-function scrollFunction(target) {
+  $("#scrollToTopButton").click(function (e) {
+    e.preventDefault();
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+  });
+
+  function reset() {
+    requestBody["skip"] = 0;
+    isSearched = false;
+  }
+
+  function addNewResults() {
+    requestBody["skip"] += take;
+    $.post("search", JSON.stringify(requestBody))
+      .done(function (data) {
+        $("#searchResult > .results").append(data);
+        total = getTotal();
+      })
+      .fail(function (error) {
+        console.error(error);
+      });
+  }
+
+  function getTotal() {
+    return parseInt($(".total").last().text());
+  }
+
+  function scrollFunction(target) {
     if (
-        document.body.scrollTop > 20 ||
-        document.documentElement.scrollTop > 20
+      document.body.scrollTop > 20 ||
+      document.documentElement.scrollTop > 20
     ) {
-        $(target).show();
+      $(target).show();
     } else {
-        $(target).hide();
+      $(target).hide();
     }
-}
+  }
 
-function getDocumentHeight() {
+  function getDocumentHeight() {
     const body = document.body;
     const html = document.documentElement;
 
     return Math.max(
-        body.scrollHeight,
-        body.offsetHeight,
-        html.clientHeight,
-        html.scrollHeight,
-        html.offsetHeight
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight
     );
-}
+  }
 
-function getScrollTop() {
+  function getScrollTop() {
     return window.pageYOffset !== undefined
-        ? window.pageYOffset
-        : (
-              document.documentElement ||
-              document.body.parentNode ||
-              document.body
-          ).scrollTop;
-}
+      ? window.pageYOffset
+      : (
+        document.documentElement ||
+        document.body.parentNode ||
+        document.body
+      ).scrollTop;
+  }
+
+  window.onscroll = function () {
+    scrollFunction("#scrollToTopButton");
+    if (
+      !isSearched ||
+      requestBody["skip"] + take >= total ||
+      getScrollTop() < getDocumentHeight() - window.innerHeight
+    ) {
+      return;
+    }
+
+    addNewResults();
+  };
+});

@@ -11,6 +11,10 @@
             href="{{ url_for('static', filename='lib/css/bootstrap.min.css') }}"
             rel="stylesheet"
         />
+        <link
+            href="{{ url_for('static', filename='lib/css/spin.css') }}"
+            rel="stylesheet"
+        />
         {% block head %}{% endblock %}
     </head>
     <body>
@@ -23,6 +27,10 @@
         <script
             type="text/javascript"
             src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/spin.js') }}"
         ></script>
         {% block scripts %}{% endblock %}
     </body>
