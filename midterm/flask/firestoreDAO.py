@@ -147,18 +147,28 @@ class FirestoreDAO:
             for info in orders_collection:
                 orders.append(info._data)
         return orders
-
+    
+    def is_order_existed(self, order_id: str) -> bool: #Ron wrote
+        order_collection = (
+            self._db.collection_group("orders")
+            .where("id", "==", order_id)
+            .get()
+        )
+        return len(order_collection) == 1
     #
-    def add_order(self, user_id, order_info):
+    def add_order(self, user_id: str, order_info: dict): #Ron wrote
         order_info["user_id"] = user_id
-        order_info["time"] = firestore.SERVER_TIMESTAMP
+        order_info["timestamp"] = firestore.SERVER_TIMESTAMP
         self._db.collection("orders").add(order_info)
 
     # orderManagement
-    def update_order(self, order_info):
+    def update_order(self, order_info): #Ron wrote
         order_id = order_info["order_id"]
-        order_doc = self._db.collection("orders").document(f"{order_id}")
+        order_doc = self._db.document(f"orders/{order_id}")
         order_doc.set(order_info)
+
+
+
 
     # stockManagement
     def add_product(self, product_info):
@@ -167,7 +177,7 @@ class FirestoreDAO:
     # stockManagement
     def update_product(self, product_info):
         product_id = product_info["product_id"]
-        product_doc = self._db.collection("products").document(f"{product_id}")
+        product_doc = self._db.document(f"products/{product_id}")
         product_doc.set(product_info)
 
 
