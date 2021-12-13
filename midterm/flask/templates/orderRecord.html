@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Bootstrap CSS -->
     <link
         href="{{ url_for('static', filename='lib/css/bootstrap.min.css') }}"
@@ -12,53 +12,51 @@
     <title>{{title}}</title>
   </head>
   <body>
-    <h1>{{title}}</h1>
-    <table class="table" id="record_table">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">日期</th>
-          <th scope="col">商品</th>
-          <th scope="col">價格</th>
-          <th scope="col">數量</th>
-          <th scope="col">總金額</th>
-          <th scope="col">狀態</th>
-        </tr>
-      </thead>
-      {% for record in records %}
-      <tbody>
-        <tr>
-          <th class="date">{{record.date}}</th>
-          <td class="name">{{record.name}}</td>
-          <td class="price">{{record.price}}</td>
-          <td class="quantity">{{record.status.quantity}}</td>
-          <td class="total"></td>
-          {% if record.state == 1 :%}
-          <td class="state">已完成訂單</td>
-          {% elif record.state == 0 %}
-          <td class="state" style="color:blue; font-weight:bold;">物流運送中</td>
-          {% else %}
-          <td class="state" style="color:red; font-weight:bold;">訂單處理中</td>
-          {% endif %}
-
-        </tr>
-      </tbody>
-      {% endfor %}
-    </table>
+      <script
+          type="text/javascript"
+          src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
+      ></script>
+      <script
+          type="text/javascript"
+          src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
+      ></script>
+      <main class="container">
+        <h1 class="mt-5 text-center">{{ title }}</h1>
+        <table class="table" id="order_table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">日期</th>
+              <th scope="col">商品</th>
+              <th scope="col">價格</th>
+              <th scope="col">數量</th>
+              <th scope="col">總金額</th>
+              <th scope="col">狀態</th>
+            </tr>
+          </thead>
+          {% for order in orders %}
+          <tbody>
+            <tr>
+              <th class="date">{{order.date}}</th>
+              <td class="name">{{order.name}}</td>
+              <td class="price">{{order.price}}</td>
+              <td class="quantity">{{order.status.quantity}}</td>
+              <td class="total"></td>
+              {% if order.state == 1 :%}
+              <td class="state">已完成訂單</td>
+              {% elif order.state == 0 %}
+              <td class="state" style="color:blue; font-weight:bold;">物流運送中</td>
+              {% else %}
+              <td class="state" style="color:red; font-weight:bold;">訂單處理中</td>
+              {% endif %}
+            </tr>
+          </tbody>
+          {% endfor %}
+        </table>
+      </main>
     <label id="userId" style="display: none">{{ user_id }}</label>
     <script
-        type="text/javascript"
-        src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"
-    ></script>
-    <script
-        type="text/javascript"
-        src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"
-    ></script>
+          type="text/javascript"
+          src="{{ url_for('static', filename='js/orderRecord.js') }}"
+      ></script>
   </body>
 </html>
-
-<script>
-  var table = document.getElementById("record_table")
-  for (var r = 1, n = table.rows.length; r < n; r++) {
-    table.rows[r].cells[4].innerHTML = table.rows[r].cells[2].innerHTML * table.rows[r].cells[3].innerHTML
-  }
-</script>

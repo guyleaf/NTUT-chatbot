@@ -169,9 +169,14 @@ def delete_favorite(user_id):
 # buyer state:-1 處理中, 0 運送中 , 1已完成
 @app.route("/<user_id>/orders", methods=["GET"])
 def get_order_page(user_id):
-    title = "訂單紀錄"
+    if not firestoreDAO.is_user_exists_by_id(user_id):
+        abort(Response(user_not_found_message_for_view, 400))
+
+    title = "我的最愛"
     orders = firestoreDAO.get_orders(user_id)
-    return render_template("orderRecord.html", **locals())
+    return render_template(
+        "orderRecord.html", title=title, orders=orders, user_id=user_id
+    )
 
 
 @app.route("/<user_id>/orders", methods=["PUT"])
