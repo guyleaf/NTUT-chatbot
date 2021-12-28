@@ -19,3 +19,4 @@ __pycache__/
 /setup.cfg
 
 localServiceAccount.json
+cloud_sql_proxy.exe
