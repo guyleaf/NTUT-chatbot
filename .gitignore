@@ -126,4 +126,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-firestoreServiceAccount.json
+localServiceAccount.json

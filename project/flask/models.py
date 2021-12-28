@@ -1,29 +1,33 @@
-﻿from marshmallow import Schema, fields, validate
+﻿from database import Base
+from flask_security import UserMixin, RoleMixin
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 
 
-class Pagination(Schema):
-    skip = fields.Integer(required=True, validate=validate.Range(min=0))
-    take = fields.Integer(
-        required=True, validate=validate.Range(min=1, max=50)
+class RolesUsers(Base):
+    __tablename__ = "roles_users"
+    id = Column(Integer(), primary_key=True)
+    user_id = Column("user_id", Integer(), ForeignKey("user.id"))
+    role_id = Column("role_id", Integer(), ForeignKey("role.id"))
+
+
+class Role(Base, RoleMixin):
+    __tablename__ = "role"
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(80), unique=True)
+    description = Column(String(255))
+
+
+class User(Base, UserMixin):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    email = Column(String(255), unique=True)
+    username = Column(String(255), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    active = Column(Boolean())
+    fs_uniquifier = Column(String(255), unique=True, nullable=False)
+    roles = relationship(
+        "Role",
+        secondary="roles_users",
+        backref=backref("users", lazy="dynamic"),
     )
-
-
-class RegistrationSchema(Schema):
-    line_id = fields.String(
-        required=True, validate=validate.Length(min=1, max=120)
-    )
-    name = fields.String(required=True, validate=validate.Length(min=1))
-
-
-class SearchArgsSchema(Pagination):
-    user_id = fields.String(required=True)
-    keyword = fields.String(required=True)
-
-
-class MyFavoritesActionSchema(Schema):
-    product_id = fields.String(required=True, validate=validate.Length(min=5))
-
-
-registration_schema = RegistrationSchema()
-search_args_schema = SearchArgsSchema()
-my_favorites_action_schema = MyFavoritesActionSchema()

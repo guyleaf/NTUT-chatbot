@@ -2,3 +2,9 @@
 firebase-admin
 line-bot-sdk
 marshmallow
+flask-security-too[common]
+sqlalchemy
+argon2_cffi
+google-cloud-pubsub
+google-cloud-secret-manager
+pymysql

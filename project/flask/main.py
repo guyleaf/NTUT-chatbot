@@ -1,10 +1,12 @@
 import json
 import os
-from flask import Flask, render_template, request, abort, jsonify
+from flask import render_template, request, abort, jsonify
 from flask.wrappers import Response
+from flask_security import current_user, auth_required, hash_password
 
+from app import app
 from firestoreDAO import firestoreDAO
-from models import (
+from schemas import (
     search_args_schema,
     my_favorites_action_schema,
     registration_schema,
@@ -22,8 +24,6 @@ from responses import (
     service_exception_message,
     make_api_response,
 )
-
-app = Flask(__name__, static_folder="static")
 
 
 @app.route("/register", methods=["POST"])

@@ -1,8 +1,5 @@
-import os
 from typing import Any
 from firebase_admin import firestore, initialize_app
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "firestoreServiceAccount.json"
 
 
 class FirestoreDAO:

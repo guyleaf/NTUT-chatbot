@@ -1,1 +1,2 @@
+service: web-gpu-a
 runtime: python39
