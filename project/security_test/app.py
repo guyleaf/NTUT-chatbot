@@ -1,25 +1,25 @@
-import json
-from flask import Flask, url_for, session, request
+from flask import Flask, url_for, session, request, abort
 from flask import render_template, redirect
-from werkzeug.urls import url_quote, url_unquote
-from authlib.integrations.flask_client import OAuth
+
+from logging import getLogger
+
+from lineLoginClient import LineLoginClient
 
 
 app = Flask(__name__)
 app.secret_key = "!secret"
 app.config.from_object("config")
+app.logger = getLogger(__name__)
 
-CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
-oauth = OAuth(app)
-oauth.register(
-    name="google",
-    server_metadata_url=CONF_URL,
-    client_kwargs={"scope": "openid email profile"},
-)
+oauth_client = LineLoginClient(app)
 
 
-def redirect_to_login(endpoint: str, **kwargs):
-    return redirect(url_for("login", page=endpoint, **kwargs))
+def save_redirect_data():
+    session["redirect_data"] = {"page": request.endpoint}
+
+
+def get_redirect_data() -> dict:
+    return session.pop("redirect_data", {})
 
 
 @app.route("/")
@@ -31,39 +31,38 @@ def home():
 @app.route("/redirect")
 def redirect_route():
     page = request.args.get("page", "home")
-    args = request.args.to_dict()
-    if "page" in args:
-        del args["page"]
-    return redirect(url_for(page, **args))
+    return redirect(url_for(page))
 
 
 @app.route("/test")
 def test():
     user = session.get("user")
     if user is None:
-        return redirect_to_login(request.endpoint)
+        save_redirect_data()
+        return redirect(url_for("login"))
+
     return user
 
 
 @app.route("/login")
 def login():
     redirect_uri = url_for("auth", _external=True)
-    state = url_quote(json.dumps(request.args))
-    return oauth.google.authorize_redirect(redirect_uri, state=state)
+    return oauth_client.authorize_redirect(redirect_uri)
 
 
 @app.route("/auth")
 def auth():
-    token = oauth.google.authorize_access_token()
-    user = oauth.google.parse_id_token(token)
-    if user:
-        session["user"] = user
+    code = request.args.get("code")
+    state = request.args.get("state")
+    if code is None or state is None:
+        abort(400)
 
-    state = url_unquote(request.args.get("state"))
-    args = {}
-    if state is not None:
-        args = json.loads(state)
-    return redirect(url_for("redirect_route", **args))
+    user = oauth_client.authorize_access_token()
+    if user is None:
+        abort(400)
+
+    session["user"] = user
+    return redirect(url_for("redirect_route", **get_redirect_data()))
 
 
 @app.route("/logout")

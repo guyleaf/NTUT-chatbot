@@ -1,0 +1,5 @@
+Flask
+Authlib
+requests
+flask-jwt-extended
+cryptography
