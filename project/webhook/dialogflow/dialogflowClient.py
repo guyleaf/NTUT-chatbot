@@ -1,4 +1,4 @@
-﻿import json
+import json
 from google.cloud import dialogflow
 from google.protobuf.json_format import MessageToJson
 from typing import Any

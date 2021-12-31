@@ -1,2 +1,2 @@
-﻿firebase-admin
+firebase-admin
 flask

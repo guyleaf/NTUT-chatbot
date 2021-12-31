@@ -1,4 +1,4 @@
-﻿from logging import getLogger
+from logging import getLogger
 from linebot import WebhookHandler, LineBotApi
 
 from settings import channel_secret, channel_access_token

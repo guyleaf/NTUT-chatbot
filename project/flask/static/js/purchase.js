@@ -1,4 +1,4 @@
-﻿function setupPurchaseFunction(userId) {
+function setupPurchaseFunction(userId) {
     $(".purchaseButton").click(function (e) {
         e.preventDefault();
     });

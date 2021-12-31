@@ -1,4 +1,4 @@
-﻿from helpers import get_text_send_message_object
+from helpers import get_text_send_message_object
 from settings import product_type
 
 

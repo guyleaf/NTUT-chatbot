@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 product_type = "GPU"
 line_api_base_url = "https://api.line.me/v2/bot/"

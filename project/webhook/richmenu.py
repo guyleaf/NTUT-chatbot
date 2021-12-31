@@ -1,4 +1,4 @@
-﻿import json
+import json
 import requests
 from linebot import LineBotApi
 

@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
     const userId = $("#userId").text();
     console.log(userId);
     const callbackForDelete = function () {

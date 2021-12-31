@@ -1,4 +1,4 @@
-﻿from secretManager import access_secret_version
+from secretManager import access_secret_version
 
 db_user = "gpu_a_service"
 db_pass = access_secret_version("", 1)

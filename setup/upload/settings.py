@@ -1,4 +1,4 @@
-﻿project_id = "chatbot-project-3135"
+project_id = "chatbot-project-3135"
 
 admins = [
     {

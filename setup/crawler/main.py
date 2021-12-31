@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 from typing import Union, Any
 import json
 from tqdm import tqdm

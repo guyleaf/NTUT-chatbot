@@ -1,4 +1,4 @@
-﻿flask
+flask
 firebase-admin
 line-bot-sdk
 google-cloud-dialogflow

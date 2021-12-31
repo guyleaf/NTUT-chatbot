@@ -1,4 +1,4 @@
-﻿from linebot.models import (
+from linebot.models import (
     FollowEvent,
     MessageEvent,
     TextMessage,

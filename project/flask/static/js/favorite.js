@@ -1,4 +1,4 @@
-﻿function setupFavoriteFunction(userId, callbackForAdd, callbackForDelete) {
+function setupFavoriteFunction(userId, callbackForAdd, callbackForDelete) {
     setupAddFavoriteFunction(userId, callbackForAdd);
     setupDeleteFavoriteFunction(userId, callbackForDelete);
 }

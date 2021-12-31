@@ -1,4 +1,4 @@
-﻿# success response
+# success response
 add_favorite_product_successfully_message_for_api = (
     "Add product to my favorites successfully"
 )

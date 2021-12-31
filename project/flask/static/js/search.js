@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
   let isSearched = false;
   const userId = $("#userId").text();
   let keyword;

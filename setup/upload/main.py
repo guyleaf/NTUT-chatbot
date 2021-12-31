@@ -1,4 +1,4 @@
-﻿import flask
+import flask
 from typing import Any, Optional
 import json
 
