@@ -128,3 +128,4 @@ dmypy.json
 
 localServiceAccount.json
 .DS_Store
+**/security_test/.vscode
