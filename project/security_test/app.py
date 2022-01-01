@@ -1,5 +1,7 @@
 from flask import Flask, url_for, session, request, abort
 from flask import render_template, redirect
+from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 from logging import getLogger
 
@@ -7,9 +9,12 @@ from lineLoginClient import LineLoginClient
 
 
 app = Flask(__name__)
-app.secret_key = "!secret"
 app.config.from_object("config")
 app.logger = getLogger(__name__)
+
+db = SQLAlchemy(app)
+
+jwt = JWTManager(app)
 
 oauth_client = LineLoginClient(app)
 
@@ -20,6 +25,12 @@ def save_redirect_data():
 
 def get_redirect_data() -> dict:
     return session.pop("redirect_data", {})
+
+
+@app.before_first_request
+def setup():
+    print("setup")
+    db.create_all()
 
 
 @app.route("/")

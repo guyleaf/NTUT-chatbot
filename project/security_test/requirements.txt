@@ -2,4 +2,4 @@ Flask
 Authlib
 requests
 flask-jwt-extended
-cryptography
+Flask-SQLAlchemy
