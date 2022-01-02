@@ -25,33 +25,6 @@ from responses import (
 )
 
 
-@app.route("/register", methods=["POST"])
-def register_user():
-    registration_info = request.get_json(force=True)
-    errors = registration_schema.validate(registration_info)
-
-    if errors:
-        return (
-            make_api_response(False, bad_request_message_for_api, errors),
-            400,
-        )
-
-    registration_info = registration_schema.load(registration_info)
-
-    if firestoreDAO.is_user_exists_by_line_id(registration_info["line_id"]):
-        user = firestoreDAO.get_user(registration_info["line_id"])
-    else:
-        user = firestoreDAO.register_user(registration_info)
-
-    if not user:
-        return (
-            make_api_response(False, service_exception_message),
-            500,
-        )
-
-    return user
-
-
 @app.route("/search", methods=["GET"])
 def get_search_page():
     user_id = request.args.get("user_id")
