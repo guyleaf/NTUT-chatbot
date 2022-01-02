@@ -1,17 +1,17 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
 
 from logging import getLogger
 
 from lineLoginClient import LineLoginClient
+from models import db
 
 
 app = Flask(__name__)
 app.config.from_object("config")
 app.logger = getLogger(__name__)
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 jwt = JWTManager(app)
 
