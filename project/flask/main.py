@@ -2,7 +2,6 @@ import json
 import os
 from flask import render_template, request, abort, jsonify
 from flask.wrappers import Response
-from flask_security import current_user, auth_required, hash_password
 
 from app import app
 from firestoreDAO import firestoreDAO
