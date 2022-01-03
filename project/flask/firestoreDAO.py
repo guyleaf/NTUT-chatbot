@@ -179,6 +179,3 @@ class FirestoreDAO:
         product_id = product_info["product_id"]
         product_doc = self._db.document(f"products/{product_id}")
         product_doc.set(product_info)
-
-
-firestoreDAO = FirestoreDAO()

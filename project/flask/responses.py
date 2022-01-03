@@ -17,7 +17,3 @@ product_not_found_message_for_view = "未知的產品 ID"
 service_exception_message = (
     "Service exception occurred. Please try again later."
 )
-
-
-def make_api_response(success: bool, message: str, data: dict = None) -> dict:
-    return {"success": success, "message": message, "data": data}

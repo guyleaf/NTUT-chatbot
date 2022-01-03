@@ -1,15 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
 
-# driver_name = "mysql+pymysql"
-
-# engine = create_engine(
-#     driver_name
-#     + "://"
-#     + f"{db_user}:{db_pass}@/{db_name}"
-#     + f"?unix_socket=cloudsql/{sql_instance_connection_name}"
-# )
-
 db = SQLAlchemy()
 
 

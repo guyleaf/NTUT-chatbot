@@ -20,3 +20,4 @@ __pycache__/
 
 localServiceAccount.json
 cloud_sql_proxy.exe
+cloud_sql_proxy
