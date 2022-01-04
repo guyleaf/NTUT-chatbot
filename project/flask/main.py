@@ -10,14 +10,41 @@ from flask_jwt_extended.utils import (
 
 from jwt.exceptions import InvalidSignatureError
 
-from app import app, db
+from app import app, db, jwt
+from models import Role, TokenBlocklist, User
 from routes import resources
 
 
-# Create a user to test with
 @app.before_first_request
 def initialize_db():
     db.create_all()
+    for name in ["customer", "seller", "admin"]:
+        db.session.add(Role(name=name, description=name))
+    db.session.commit()
+
+
+# Register a callback function that takes whatever object is passed in as the
+# identity when creating JWTs and converts it to a JSON serializable format.
+@jwt.user_identity_loader
+def user_identity_lookup(user: User):
+    return user.id
+
+
+# Register a callback function that loads a user from your database whenever
+# a protected route is accessed. This should return any python object on a
+# successful lookup, or None if the lookup failed for any reason (for example
+# if the user has been deleted from the database).
+@jwt.user_lookup_loader
+def user_lookup_callback(_, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(id=identity).one_or_none()
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(_, jwt_payload):
+    jti = jwt_payload["jti"]
+    token = TokenBlocklist.query.filter_by(jti=jti).scalar()
+    return token is not None
 
 
 @app.errorhandler(InvalidSignatureError)
@@ -31,7 +58,7 @@ def jwt_exception_handler(exception):
 def refresh_expiring_jwts(response):
     try:
         exp_timestamp = get_jwt()["exp"]
-        now = datetime.now(timezone.utc)
+        now = datetime.now(timezone(timedelta(hours=+8)))
         target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
             access_token = create_access_token(identity=get_jwt_identity())

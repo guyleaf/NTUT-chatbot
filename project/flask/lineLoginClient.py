@@ -77,4 +77,5 @@ class LineLoginClient:
         return {
             "username": claims["name"],
             "lineId": claims["sub"],
+            "email": claims["email"],
         }
