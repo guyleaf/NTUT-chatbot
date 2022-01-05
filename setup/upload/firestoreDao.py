@@ -34,7 +34,7 @@ class FirestoreDao:
 
     def upload_code_data(self, data: list[dict[str, Any]]):
         batch_action = self._db.batch()
-        codes_collection = self._db.collection(u"codes")
+        codes_collection = self._db.collection("codes")
 
         for code in data:
             code_document = codes_collection.document(code["id"])
@@ -45,10 +45,10 @@ class FirestoreDao:
     def get_product_status_codes(
         self, names: list[str]
     ) -> list[dict[str, Any]]:  # noqa: E501
-        codes_collection = self._db.collection(u"codes")
+        codes_collection = self._db.collection("codes")
         documents = (
             codes_collection.where("type", "==", "product_status")
-            .where(u"name", u"in", names)
+            .where("name", "in", names)
             .get()
         )
 
@@ -59,8 +59,10 @@ class FirestoreDao:
             shard = Shard()
             collection.document(str(num)).set(shard.to_dict())
 
-    def upload_products(self, products: list[dict[str, Any]]):
-        products_collection = self._db.collection(u"products")
+    def upload_products(self, company_id: str, products: list[dict[str, Any]]):
+        products_collection = self._db.collection(
+            f"companies/{company_id}/products"
+        )
         self._init_shards(products_collection)
 
         batch_action = self._db.batch()
@@ -93,21 +95,6 @@ class FirestoreDao:
             batch_action.update(
                 products_document, {"count": firestore.firestore.Increment(1)}
             )
-
-        batch_action.commit()
-
-    def add_user(self, user: dict[str, Any]):
-        user_document = self._db.collection(u"users").document()
-
-        user["id"] = user_document.id
-        user_document.create(user)
-
-    def clear_user(self):
-        batch_action = self._db.batch()
-        users_collection = self._db.collection(u"users").stream()
-
-        for document in users_collection:
-            batch_action.delete(document.reference)
 
         batch_action.commit()
 

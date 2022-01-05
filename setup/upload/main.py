@@ -1,9 +1,8 @@
 import flask
-from typing import Any, Optional
 import json
 
 from firestoreDao import firestore_dao
-from settings import admins
+from settings import company_ids
 
 
 def init():
@@ -19,21 +18,14 @@ def init():
         }
         del product["quantity"]
 
-    firestore_dao.upload_products(products)
-
-
-def register():
-    firestore_dao.clear_user()
-    for user in admins:
-        firestore_dao.add_user(user)
+    for company_id in company_ids:
+        firestore_dao.upload_products(company_id, products)
 
 
 def main(request: flask.Request):
     request_args = request.args
 
-    if request_args["action"] == "register":
-        register()
-    elif request_args["action"] == "init":
+    if request_args["action"] == "init":
         init()
     else:
         return "400 Bad Request", 400
