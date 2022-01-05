@@ -71,6 +71,7 @@ class FirestoreDao:
             date_time = datetime.datetime.now()
             product["created_time"] = date_time
             product["updated_time"] = date_time
+            product["company_id"] = company_id
 
             # products_collection: [ <=== products_document
             #     {
