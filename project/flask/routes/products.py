@@ -1,36 +1,33 @@
-﻿from flask import request, abort, Blueprint, Response, render_template
+﻿from flask import request, Blueprint, render_template
+from flask_jwt_extended import jwt_required, current_user
 
 from app import firestoreDAO
+from decorators import roles_accepted
 from helpers import make_api_response
 
 from schemas import search_args_schema
-from responses import (
-    bad_request_message_for_api,
-    user_not_found_message_for_view,
-    user_not_found_message_for_api,
-    user_missing_message_for_view,
-)
+from responses import bad_request_message_for_api
 
 
 products_resource = Blueprint(
-    "products", __name__, template_folder="templates"
+    "products",
+    __name__,
+    template_folder="templates",
+    url_prefix="/products",
 )
 
 
 @products_resource.route("/search", methods=["GET"])
-def get_search_page():
-    user_id = request.args.get("user_id")
-    if not user_id:
-        abort(Response(user_missing_message_for_view, 400))
-
-    if not firestoreDAO.is_user_exists_by_id(user_id):
-        abort(Response(user_not_found_message_for_view, 400))
-
+@jwt_required()
+@roles_accepted(["customer", "seller"])
+def search_page():
     title = "商品搜尋"
-    return render_template("search.html", title=title, user_id=user_id)
+    return render_template("products/search.html", title=title)
 
 
 @products_resource.route("/search", methods=["POST"])
+@jwt_required()
+@roles_accepted(["customer", "seller"])
 def search_products():
     search_args = request.get_json(force=True)
     errors = search_args_schema.validate(search_args)
@@ -42,15 +39,10 @@ def search_products():
         )
 
     search_args = search_args_schema.load(search_args)
-    user_id = search_args["user_id"]
 
-    if not firestoreDAO.is_user_exists_by_id(user_id):
-        return (
-            make_api_response(False, user_not_found_message_for_api),
-            404,
-        )
-
-    favorite_product_ids = firestoreDAO.get_favorite_product_ids(user_id)
+    favorite_product_ids = firestoreDAO.get_favorite_product_ids(
+        current_user.id
+    )
     total, products = firestoreDAO.get_products_by_keyword(
         search_args["skip"], search_args["take"], search_args["keyword"]
     )
@@ -72,15 +64,17 @@ def search_products():
 
     title = "商品列表"
     return render_template(
-        "shared/products.html",
+        "products/productList.html",
         title=title,
         product_infos=product_infos,
         total=total,
     )
 
 
-@products_resource.route("/products/<product_id>", methods=["GET"])
-def get_product_page(product_id):
+@products_resource.route("/<product_id>", methods=["GET"])
+@jwt_required()
+@roles_accepted(["customer", "seller"])
+def product_page(product_id):
     products = firestoreDAO.get_products_by_ids([product_id])
 
     if len(products) == 0:
@@ -88,14 +82,9 @@ def get_product_page(product_id):
     return f"Product ID: {product_id}"
 
 
-@products_resource.route("/products/<product_id>", methods=["POST"])
-def purchase_product(product_id):
-    pass
-
-
 # seller
-@products_resource.route("/<user_id>/products", methods=["GET"])
-def manage_products(user_id):
+@products_resource.route("/", methods=["GET"])
+def new_product_page(user_id):
     title = "商品管理"
     produtcts = firestoreDAO.get_products(user_id)
     return render_template("productManagement.html", **locals())

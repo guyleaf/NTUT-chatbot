@@ -1,14 +1,10 @@
-import os
-
 from flask import Flask
 from flask_jwt_extended import JWTManager
 
 from firestoreDAO import FirestoreDAO
 from lineLoginClient import LineLoginClient
-from settings import FlaskSettings, service_account_key_path
+from settings import FlaskSettings
 from models import db
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_key_path
 
 
 app = Flask(__name__, static_folder="static")

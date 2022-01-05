@@ -15,8 +15,9 @@ from flask_jwt_extended import (
     current_user,
 )
 from flask_jwt_extended.utils import get_jwt
+from flask_cors import cross_origin
 
-from app import oauth_client, db
+from app import oauth_client, db, firestoreDAO
 from models import Role, TokenBlocklist, User
 from helpers import get_redirect_data
 
@@ -24,8 +25,9 @@ auth_resource = Blueprint("auth", __name__, static_folder="templates")
 
 
 @auth_resource.route("/login", methods=["GET"])
+@cross_origin()
 def login():
-    redirect_uri = url_for("auth", _external=True)
+    redirect_uri = url_for("resources.auth.auth", _external=True)
     return oauth_client.authorize_redirect(redirect_uri)
 
 
@@ -44,6 +46,7 @@ def auth():
 
     if user_data is None:
         customer_role = Role.query.filter_by(name="customer").one_or_none()
+
         user_data = User(
             id=secrets.token_hex(16),
             username=user["username"],
@@ -53,20 +56,24 @@ def auth():
         )
         db.session.add(user_data)
         db.session.commit()
+        firestoreDAO.initialize_data_for_user(user_data.id)
 
     access_token = create_access_token(identity=user_data)
-    response = redirect(url_for("redirect_route", **get_redirect_data()))
+    response = redirect(
+        url_for("resources.redirect_route", **get_redirect_data())
+    )
     set_access_cookies(response, access_token)
     return response
 
 
 @auth_resource.route("/logout")
-@jwt_required
+@jwt_required(optional=True)
 def logout():
-    jti = get_jwt()["jti"]
-    now = datetime.now(timezone(timedelta(hours=+8)))
-    db.session.add(TokenBlocklist(jti=jti, created_at=now))
-    db.session.commit()
+    jti = get_jwt().get("jti")
+    if jti:
+        now = datetime.now(timezone(timedelta(hours=+8)))
+        db.session.add(TokenBlocklist(jti=jti, created_at=now))
+        db.session.commit()
 
     response = redirect("/")
     unset_jwt_cookies(response)
@@ -75,10 +82,11 @@ def logout():
 
 @auth_resource.route("/me", methods=["GET"])
 @jwt_required()
-def protected():
+def my_info():
     return {
         "id": current_user.id,
         "username": current_user.username,
         "email": current_user.email,
         "role": current_user.role.name,
+        "lineId": current_user.line_id,
     }

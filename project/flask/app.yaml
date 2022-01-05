@@ -1,2 +1,4 @@
 service: web-gpu-a
 runtime: python39
+env_variables:
+    FLASK_ENV: "production"

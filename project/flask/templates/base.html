@@ -30,7 +30,15 @@
         ></script>
         <script
             type="text/javascript"
+            src="{{ url_for('static', filename='lib/js/js.cookie.min.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
             src="{{ url_for('static', filename='lib/js/spin.js') }}"
+        ></script>
+        <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='js/helpers.js') }}"
         ></script>
         {% block scripts %}{% endblock %}
     </body>

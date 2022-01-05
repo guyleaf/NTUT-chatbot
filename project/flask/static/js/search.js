@@ -1,6 +1,5 @@
 $(function () {
   let isSearched = false;
-  const userId = $("#userId").text();
   let keyword;
 
   const spinner = new Spin.Spinner().spin();
@@ -8,7 +7,6 @@ $(function () {
   const take = 10;
 
   let requestBody = {
-    user_id: userId,
     keyword: keyword,
     skip: 0,
     take: take,
@@ -25,21 +23,34 @@ $(function () {
     keyword = $("#searchTextbox").val();
     requestBody["keyword"] = keyword;
 
-    $.post("search", JSON.stringify(requestBody))
-      .done(function (data) {
-        $("#searchResult > .results").html(data);
+    $.ajax({
+      type: "POST",
+      url: "/products/search",
+      headers: {
+        'X-CSRF-TOKEN': getCsrfToken()
+      },
+      data: JSON.stringify(requestBody),
+      contentType: "application/json; charset=UTF-8"
+    })
+      .done(function (data, _, xhr) {
+        let contentType = xhr.getResponseHeader("Content-Type");
 
-        total = getTotal();
-        if (total === 0) {
-          $("#resultsNotFoundMessage").show();
+        if (contentType === "application/json") {
+          handleJsonResponse(data)
         }
+        else {
+          $("#searchResult > .results").html(data);
 
-        setupFavoriteFunction(userId);
-        isSearched = true;
+          total = getTotal();
+          if (total === 0) {
+            $("#resultsNotFoundMessage").show();
+          }
+
+          // setupFavoriteFunction(userId);
+          isSearched = true;
+        }
       })
-      .fail(function (error) {
-        console.error(error);
-      });
+      .fail(handleErrorResponse);
   });
 
   $("#scrollToTopButton").click(function (e) {
@@ -55,14 +66,29 @@ $(function () {
 
   function addNewResults() {
     requestBody["skip"] += take;
-    $.post("search", JSON.stringify(requestBody))
-      .done(function (data) {
-        $("#searchResult > .results").append(data);
-        total = getTotal();
+
+    $.ajax({
+      type: "POST",
+      url: "/products/search",
+      headers: {
+        'X-CSRF-TOKEN': getCsrfToken()
+      },
+      data: JSON.stringify(requestBody),
+      contentType: "application/json; charset=UTF-8",
+      dataType: "html"
+    })
+      .done(function (data, _, xhr) {
+        let contentType = xhr.getResponseHeader("Content-Type");
+
+        if (contentType === "application/json") {
+          handleJsonResponse(data)
+        }
+        else {
+          $("#searchResult > .results").append(data);
+          total = getTotal();
+        }
       })
-      .fail(function (error) {
-        console.error(error);
-      });
+      .fail(handleErrorResponse);
   }
 
   function getTotal() {

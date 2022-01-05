@@ -1,6 +1,8 @@
 from typing import Any
 from firebase_admin import firestore, initialize_app
 
+from settings import company_id
+
 
 class FirestoreDAO:
     _db: firestore.firestore.Client
@@ -14,6 +16,7 @@ class FirestoreDAO:
     ):
         products_collection = (
             self._db.collection_group("product_items")
+            .where("company_id", "==", company_id)
             .where("status.is_available", "==", True)
             .where("status.is_deleted", "==", False)
         )
@@ -37,15 +40,12 @@ class FirestoreDAO:
             .stream()
         )
 
-    def is_user_exists_by_id(self, user_id: str) -> bool:
-        result = self._db.document(f"users/{user_id}").get()
-        return result.exists
+    def initialize_data_for_user(self, user_id: str):
+        user_document = self._db.collection(
+            f"companies/{company_id}/users"
+        ).document(user_id)
 
-    def is_user_exists_by_line_id(self, line_id: str) -> bool:
-        result = (
-            self._db.collection("users").where("line_id", "==", line_id).get()
-        )
-        return len(result) != 0
+        user_document.create({"user_id": user_id, "favorite_product_ids": []})
 
     def is_admin(self, user_id: str) -> bool:
         result = (
@@ -55,21 +55,6 @@ class FirestoreDAO:
             .get("is_admin", False)
         )
         return result
-
-    def register_user(self, registration_info: dict[str, Any]):
-        user_document = self._db.collection("users").document()
-        registration_info["id"] = user_document.id
-        registration_info["is_admin"] = False
-        registration_info["favorite_product_ids"] = []
-        user_document.create(registration_info)
-
-        return user_document.get().to_dict()
-
-    def get_user(self, line_id: str) -> dict[str, Any]:
-        result = (
-            self._db.collection("users").where("line_id", "==", line_id).get()
-        )
-        return next(iter(result)).to_dict()
 
     # search / products
     def get_products_by_keyword(
@@ -90,7 +75,7 @@ class FirestoreDAO:
 
     def get_favorite_product_ids(self, user_id: str) -> list[str]:
         return (
-            self._db.document(f"users/{user_id}")
+            self._db.document(f"companies/{company_id}/users/{user_id}")
             .get(["favorite_product_ids"])
             .to_dict()
             .get("favorite_product_ids", [])

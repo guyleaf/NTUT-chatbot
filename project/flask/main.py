@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta, timezone
 import os
+
+from flask import request
+from flask.helpers import make_response, url_for
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_jwt_extended.utils import (
     create_access_token,
@@ -9,25 +12,38 @@ from flask_jwt_extended.utils import (
 )
 
 from jwt.exceptions import InvalidSignatureError
+from werkzeug.exceptions import HTTPException
+from werkzeug.sansio.response import Response
+from werkzeug.utils import redirect
 
 from app import app, db, jwt
+from exceptions import UnauthorizedAccessException
 from models import Role, TokenBlocklist, User
 from routes import resources
+from helpers import save_redirect_data, make_api_response
 
 
 @app.before_first_request
 def initialize_db():
+    # if app.config["ENV"] == "development":
+    #     db.drop_all()
+
     db.create_all()
-    for name in ["customer", "seller", "admin"]:
-        db.session.add(Role(name=name, description=name))
-    db.session.commit()
+    # for name in ["customer", "seller", "admin"]:
+    #     role = Role.query.filter_by(name=name).one_or_none()
+    #     if role is None:
+    #         db.session.add(Role(name=name, description=name))
+    # db.session.commit()
 
 
 # Register a callback function that takes whatever object is passed in as the
 # identity when creating JWTs and converts it to a JSON serializable format.
 @jwt.user_identity_loader
 def user_identity_lookup(user: User):
-    return user.id
+    if isinstance(user, User):
+        return user.id
+    else:
+        return user.get("id")
 
 
 # Register a callback function that loads a user from your database whenever
@@ -47,21 +63,49 @@ def check_if_token_revoked(_, jwt_payload):
     return token is not None
 
 
-@app.errorhandler(InvalidSignatureError)
-@app.errorhandler(NoAuthorizationError)
-def jwt_exception_handler(exception):
-    app.logger.exception(exception)
-    return "Unauthorized", 401
+def redirect_to_login():
+    save_redirect_data(request.url_rule.endpoint)
+    print(request)
+    if request.content_type and "application/json" in request.content_type:
+        return make_api_response(
+            False, "Please Login First", {"redirect": "/login"}
+        )
+    return redirect("/login")
+
+
+@app.errorhandler(UnauthorizedAccessException)
+def handle_unauthorized_access(e: UnauthorizedAccessException):
+    message = e.message
+    if request.content_type and "application/json" in request.content_type:
+        return make_api_response(False, message), 401
+    else:
+        return message, 401
+
+
+@jwt.unauthorized_loader
+def jwt_exception_handler(_):
+    save_redirect_data(request.url_rule.endpoint)
+    return redirect_to_login()
+
+
+@jwt.invalid_token_loader
+@jwt.revoked_token_loader
+@jwt.user_lookup_error_loader
+@jwt.expired_token_loader
+def token_handler(_jwt_header, _jwt_payload):
+    save_redirect_data(request.url_rule.endpoint)
+    return redirect_to_login()
 
 
 @app.after_request
 def refresh_expiring_jwts(response):
     try:
-        exp_timestamp = get_jwt()["exp"]
+        token = get_jwt()
+        exp_timestamp = token["exp"]
         now = datetime.now(timezone(timedelta(hours=+8)))
         target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=get_jwt_identity())
+            access_token = create_access_token(identity=token)
             set_access_cookies(response, access_token)
         return response
     except (RuntimeError, KeyError):
