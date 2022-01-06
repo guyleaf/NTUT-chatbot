@@ -2,18 +2,13 @@ from datetime import datetime, timedelta, timezone
 import os
 
 from flask import request
-from flask.helpers import make_response, url_for
-from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_jwt_extended.utils import (
     create_access_token,
     get_jwt,
-    get_jwt_identity,
+    current_user,
     set_access_cookies,
 )
 
-from jwt.exceptions import InvalidSignatureError
-from werkzeug.exceptions import HTTPException
-from werkzeug.sansio.response import Response
 from werkzeug.utils import redirect
 
 from app import app, db, jwt
@@ -40,10 +35,7 @@ def initialize_db():
 # identity when creating JWTs and converts it to a JSON serializable format.
 @jwt.user_identity_loader
 def user_identity_lookup(user: User):
-    if isinstance(user, User):
-        return user.id
-    else:
-        return user.get("id")
+    return user.id
 
 
 # Register a callback function that loads a user from your database whenever
@@ -105,7 +97,7 @@ def refresh_expiring_jwts(response):
         now = datetime.now(timezone(timedelta(hours=+8)))
         target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=token)
+            access_token = create_access_token(identity=current_user)
             set_access_cookies(response, access_token)
         return response
     except (RuntimeError, KeyError):

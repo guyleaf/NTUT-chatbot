@@ -15,7 +15,6 @@ from flask_jwt_extended import (
     current_user,
 )
 from flask_jwt_extended.utils import get_jwt
-from flask_cors import cross_origin
 
 from app import oauth_client, db, firestoreDAO
 from models import Role, TokenBlocklist, User
@@ -25,7 +24,6 @@ auth_resource = Blueprint("auth", __name__, static_folder="templates")
 
 
 @auth_resource.route("/login", methods=["GET"])
-@cross_origin()
 def login():
     redirect_uri = url_for("resources.auth.auth", _external=True)
     return oauth_client.authorize_redirect(redirect_uri)
