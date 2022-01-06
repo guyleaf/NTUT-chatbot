@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 from logging import getLogger
 
 from lineLoginClient import LineLoginClient
-from models import db
+from models import db, User
 
 
 app = Flask(__name__)
@@ -22,3 +22,14 @@ oauth_client = LineLoginClient(app)
 def setup():
     print("setup")
     db.create_all()
+
+
+# @jwt.user_identity_loader
+# def user_identity_lookup(user):
+#     return user.id
+
+
+# @jwt.user_lookup_loader
+# def user_lookup_callback(_, jwt_data):
+#     identity = jwt_data["sub"]
+#     return User.query.filter_by(id=identity).one_or_none()
