@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% set title = "商品搜尋" if is_customer else "商品管理" %}
+
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="container">
@@ -9,7 +11,7 @@
             name="keyword"
             type="text"
             class="form-control"
-            placeholder="商品名稱"
+            placeholder="請輸入搜尋關鍵字"
             aria-label="search_textbox"
         />
         <button

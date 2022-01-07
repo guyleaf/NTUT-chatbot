@@ -2,6 +2,9 @@
 {% set product_status = product_info.product.status %}
 {% set product_id = product_info.product.id %}
 {% set can_buy = not product_status.is_deleted and product_status.is_available and product_status.quantity > 0 %}
+{% set purchase_button_enabled = is_seller or can_buy %}
+{% set purchase_button_text = "編輯" if is_seller else ("購買" if can_buy else "無法購買") %}
+
 <div class="col">
     <div class="card">
         <img
@@ -31,13 +34,13 @@
                 {% endif %}
             </div>
 
-            {% if can_buy %}
+            {% if purchase_button_enabled %}
                 <a
                     role="button"
                     class="btn btn-primary"
-                    href="{{ url_for('resources.products.get_product_page', product_id=product_id) }}"
+                    href="{{ url_for('resources.products.product_page', product_id=product_id) }}"
                 >
-                    購買
+                    {{ purchase_button_text }}
                 </a>
             {% else %}
                 <a
@@ -46,9 +49,18 @@
                     href="#"
                     aria-disabled="true"
                 >
-                    無法購買
+                    {{ purchase_button_text }}
                 </a>
             {% endif %}
+            
+            <button
+                type="button"
+                class="btn btn-danger addFavoriteButton"
+                data-product-id="{{ product_id }}"
+                style="display: {{ none if product_info.is_favorite else block }}"
+            >
+                加入最愛
+            </button>
 
             <button
                 type="button"
@@ -58,27 +70,6 @@
             >
                 移除最愛
             </button>
-
-            {% if product_status.is_deleted %}
-                <button
-                    type="button"
-                    class="btn btn-danger addFavoriteButton"
-                    data-product-id="{{ product_id }}"
-                    style="display: {{ none if product_info.is_favorite else block }}"
-                    disabled
-                >
-                    加入最愛
-                </button>
-            {% else %}
-                <button
-                    type="button"
-                    class="btn btn-danger addFavoriteButton"
-                    data-product-id="{{ product_id }}"
-                    style="display: {{ none if product_info.is_favorite else block }}"
-                >
-                    加入最愛
-                </button>
-            {% endif %}
         </div>
     </div>
 </div>

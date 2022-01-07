@@ -1,6 +1,9 @@
-﻿from flask import Blueprint, request, abort, Response, render_template
+﻿from flask import Blueprint, request, render_template
+from flask_jwt_extended import current_user
+from flask_jwt_extended.view_decorators import jwt_required
 
 from app import firestoreDAO
+from decorators import roles_accepted
 from helpers import make_api_response
 
 from schemas import my_favorites_action_schema
@@ -8,8 +11,6 @@ from responses import (
     add_favorite_product_successfully_message_for_api,
     remove_favorite_product_successfully_message_for_api,
     bad_request_message_for_api,
-    user_not_found_message_for_view,
-    user_not_found_message_for_api,
     product_not_found_message_for_api,
 )
 
@@ -19,13 +20,11 @@ favorites_resource = Blueprint(
 )
 
 
-@favorites_resource.route("/<user_id>/myFavorites", methods=["GET"])
-def get_my_favorite_page(user_id):
-    if not firestoreDAO.is_user_exists_by_id(user_id):
-        abort(Response(user_not_found_message_for_view, 400))
-
-    title = "我的最愛"
-    products = firestoreDAO.get_favorite_products(user_id)
+@favorites_resource.route("/myFavorites", methods=["GET"])
+@jwt_required()
+@roles_accepted(["customer", "seller"])
+def get_my_favorite_page():
+    products = firestoreDAO.get_favorite_products(current_user.user.id)
 
     product_infos = [
         {"is_favorite": True, "product": product} for product in products
@@ -33,18 +32,17 @@ def get_my_favorite_page(user_id):
 
     return render_template(
         "myFavorites.html",
-        title=title,
         product_infos=product_infos,
         total=len(product_infos),
-        user_id=user_id,
     )
 
 
-@favorites_resource.route("/<user_id>/myFavorites", methods=["POST", "DELETE"])
-def add_favorite(user_id):
+@favorites_resource.route("/myFavorites", methods=["POST", "DELETE"])
+@jwt_required()
+@roles_accepted(["customer", "seller"])
+def add_favorite():
     body = request.get_json(force=True)
     errors = my_favorites_action_schema.validate(body)
-
     if errors:
         return (
             make_api_response(False, bad_request_message_for_api, errors),
@@ -54,18 +52,13 @@ def add_favorite(user_id):
     body = my_favorites_action_schema.load(body)
 
     product_id = body["product_id"]
-
-    if not firestoreDAO.is_user_exists_by_id(user_id):
-        return (
-            make_api_response(False, user_not_found_message_for_api),
-            404,
-        )
     if not firestoreDAO.is_product_existed(product_id):
         return (
             make_api_response(False, product_not_found_message_for_api),
             404,
         )
 
+    user_id = current_user.user.id
     if request.method == "POST":
         firestoreDAO.add_favorite(user_id, product_id)
         return make_api_response(

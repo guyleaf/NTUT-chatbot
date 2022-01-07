@@ -12,14 +12,16 @@ class FirestoreDAO:
         self._db = firestore.client()
 
     def _get_products_stream_by_keyword(
-        self, keyword: str, skip: int, take: int
+        self, keyword: str, skip: int, take: int, include_all: bool
     ):
-        products_collection = (
-            self._db.collection_group("product_items")
-            .where("company_id", "==", company_id)
-            .where("status.is_available", "==", True)
-            .where("status.is_deleted", "==", False)
+        products_collection = self._db.collection_group("product_items").where(
+            "company_id", "==", company_id
         )
+
+        if not include_all:
+            products_collection = products_collection.where(
+                "status.is_available", "==", True
+            ).where("status.is_deleted", "==", False)
 
         if len(keyword) != 0:
             query = products_collection.where("name", ">=", keyword).where(
@@ -33,9 +35,10 @@ class FirestoreDAO:
             query.offset(skip).limit(take).order_by("name").stream(),
         )
 
-    def _get_products_stream_by_ids(self, product_ids: list[str]):
+    def _get_products_stream_by_ids(self, product_ids: "list[str]"):
         return (
             self._db.collection_group("product_items")
+            .where("company_id", "==", company_id)
             .where("id", "in", product_ids)
             .stream()
         )
@@ -47,33 +50,28 @@ class FirestoreDAO:
 
         user_document.create({"user_id": user_id, "favorite_product_ids": []})
 
-    def is_admin(self, user_id: str) -> bool:
-        result = (
-            self._db.document(f"users/{user_id}")
-            .get(["is_admin"])
-            .to_dict()
-            .get("is_admin", False)
-        )
-        return result
-
     # search / products
     def get_products_by_keyword(
-        self, skip: int, take: int, keyword: str = None
+        self,
+        skip: int,
+        take: int,
+        keyword: str = None,
+        include_all: bool = False,
     ):
         total, results = self._get_products_stream_by_keyword(
-            keyword, skip, take
+            keyword, skip, take, include_all
         )
         return sum(1 for _ in total), [
             product.to_dict() for product in results
         ]
 
     def get_products_by_ids(
-        self, product_ids: list[str]
-    ) -> list[dict[str, Any]]:
+        self, product_ids: "list[str]"
+    ) -> "list[dict[str, Any]]":
         results = self._get_products_stream_by_ids(product_ids)
         return [product.to_dict() for product in results]
 
-    def get_favorite_product_ids(self, user_id: str) -> list[str]:
+    def get_favorite_product_ids(self, user_id: str) -> "list[str]":
         return (
             self._db.document(f"companies/{company_id}/users/{user_id}")
             .get(["favorite_product_ids"])
@@ -82,7 +80,7 @@ class FirestoreDAO:
         )
 
     # myFavorites
-    def get_favorite_products(self, user_id: str) -> list[dict[str, Any]]:
+    def get_favorite_products(self, user_id: str) -> "list[dict[str, Any]]":
         favorite_product_ids = self.get_favorite_product_ids(user_id)
         return (
             self.get_products_by_ids(favorite_product_ids)
@@ -93,6 +91,7 @@ class FirestoreDAO:
     def is_product_existed(self, product_id: str) -> bool:
         products_collection = (
             self._db.collection_group("product_items")
+            .where("company_id", "==", company_id)
             .where("id", "==", product_id)
             .get()
         )

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import os
+from typing import Optional
 
 from flask import request
 from flask_jwt_extended.utils import (
@@ -12,8 +13,9 @@ from flask_jwt_extended.utils import (
 from werkzeug.utils import redirect
 
 from app import app, db, jwt
+from dtos import UserInfo
 from exceptions import UnauthorizedAccessException
-from models import Role, TokenBlocklist, User
+from models import TokenBlocklist, User
 from routes import resources
 from helpers import save_redirect_data, make_api_response
 
@@ -43,9 +45,13 @@ def user_identity_lookup(user: User):
 # successful lookup, or None if the lookup failed for any reason (for example
 # if the user has been deleted from the database).
 @jwt.user_lookup_loader
-def user_lookup_callback(_, jwt_data):
+def user_lookup_callback(_, jwt_data) -> Optional[User]:
     identity = jwt_data["sub"]
-    return User.query.filter_by(id=identity).one_or_none()
+    user = User.query.filter_by(id=identity).one_or_none()
+    if user:
+        user = UserInfo(user)
+
+    return user
 
 
 @jwt.token_in_blocklist_loader
@@ -57,7 +63,6 @@ def check_if_token_revoked(_, jwt_payload):
 
 def redirect_to_login():
     save_redirect_data(request.url_rule.endpoint)
-    print(request)
     if request.content_type and "application/json" in request.content_type:
         return make_api_response(
             False, "Please Login First", {"redirect": "/login"}
@@ -74,13 +79,13 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
         return message, 401
 
 
+@jwt.invalid_token_loader
 @jwt.unauthorized_loader
 def jwt_exception_handler(_):
     save_redirect_data(request.url_rule.endpoint)
     return redirect_to_login()
 
 
-@jwt.invalid_token_loader
 @jwt.revoked_token_loader
 @jwt.user_lookup_error_loader
 @jwt.expired_token_loader
@@ -97,7 +102,7 @@ def refresh_expiring_jwts(response):
         now = datetime.now(timezone(timedelta(hours=+8)))
         target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=current_user)
+            access_token = create_access_token(identity=current_user.user)
             set_access_cookies(response, access_token)
         return response
     except (RuntimeError, KeyError):

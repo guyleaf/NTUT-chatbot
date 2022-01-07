@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% set title = "我的最愛" %}
+
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="container">
@@ -9,11 +11,9 @@
         </p>
     {% endif %}
     <div class="row row-cols-1 row-cols-sm-3 g-2 results">
-        {% include "shared/products.html" %}
+        {% include "products/productList.html" %}
     </div>
 </div>
-
-<label id="userId" style="display: none">{{ user_id }}</label>
 
 {% include "shared/favoriteModals.html" %}
 {% endblock %}

@@ -14,6 +14,7 @@ db_pass = access_secret_version(
     "projects/567768457788/secrets/GPU_A_SQL_PASSWORD", 1
 )
 db_name = "security"
+db_ip = os.environ.get("DATABASE_IP", "127.0.0.1:3306")
 
 sql_instance_connection_name = "chatbot-project-3135:asia-east1:chatbots-gpu-a"
 
@@ -27,7 +28,7 @@ class FlaskSettings:
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     SQLALCHEMY_DATABASE_URI = (
         "mysql+pymysql://"
-        + f"{db_user}:{db_pass}@127.0.0.1:3306/{db_name}"
+        + f"{db_user}:{db_pass}@{db_ip}/{db_name}"
         # + f"?unix_socket=cloudsql/{sql_instance_connection_name}"
     )
     LINE_CLIENT_ID = access_secret_version(

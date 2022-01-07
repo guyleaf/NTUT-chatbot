@@ -46,7 +46,7 @@ $(function () {
             $("#resultsNotFoundMessage").show();
           }
 
-          // setupFavoriteFunction(userId);
+          setupFavoriteFunction();
           isSearched = true;
         }
       })

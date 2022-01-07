@@ -82,9 +82,9 @@ def logout():
 @jwt_required()
 def my_info():
     return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "email": current_user.email,
-        "role": current_user.role.name,
-        "lineId": current_user.line_id,
+        "id": current_user.user.id,
+        "username": current_user.user.username,
+        "email": current_user.user.email,
+        "role": current_user.user.role.name,
+        "lineId": current_user.user.line_id,
     }

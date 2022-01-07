@@ -5,12 +5,12 @@ from flask_jwt_extended import verify_jwt_in_request
 from exceptions import UnauthorizedAccessException
 
 
-def roles_accepted(roles: list[str]):
+def roles_accepted(roles: "list[str]"):
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
-            role_name = current_user.role.name
+            role_name = current_user.user.role.name
             if role_name in roles:
                 return fn(*args, **kwargs)
             else:

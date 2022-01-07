@@ -21,8 +21,9 @@ products_resource = Blueprint(
 @jwt_required()
 @roles_accepted(["customer", "seller"])
 def search_page():
-    title = "商品搜尋"
-    return render_template("products/search.html", title=title)
+    return render_template(
+        "products/search.html", is_customer=current_user.is_customer()
+    )
 
 
 @products_resource.route("/search", methods=["POST"])
@@ -40,11 +41,15 @@ def search_products():
 
     search_args = search_args_schema.load(search_args)
 
+    is_seller = current_user.is_seller()
     favorite_product_ids = firestoreDAO.get_favorite_product_ids(
-        current_user.id
+        current_user.user.id
     )
     total, products = firestoreDAO.get_products_by_keyword(
-        search_args["skip"], search_args["take"], search_args["keyword"]
+        search_args["skip"],
+        search_args["take"],
+        search_args["keyword"],
+        include_all=is_seller,
     )
 
     product_infos = []
@@ -62,12 +67,11 @@ def search_products():
         product_info["product"] = product
         product_infos.append(product_info)
 
-    title = "商品列表"
     return render_template(
         "products/productList.html",
-        title=title,
         product_infos=product_infos,
         total=total,
+        is_seller=is_seller,
     )
 
 
