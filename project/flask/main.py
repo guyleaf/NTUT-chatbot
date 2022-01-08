@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import os
 from typing import Optional
 
 from flask import request
+from flask.helpers import url_for
 from flask_jwt_extended.utils import (
     create_access_token,
     get_jwt,
@@ -17,7 +18,7 @@ from dtos import UserInfo
 from exceptions import UnauthorizedAccessException
 from models import TokenBlocklist, User
 from routes import resources
-from helpers import make_api_response
+from helpers import make_api_response, now
 
 
 @app.before_first_request
@@ -64,7 +65,9 @@ def check_if_token_revoked(_, jwt_payload):
 def redirect_to_login():
     if request.content_type and "application/json" in request.content_type:
         return make_api_response(
-            False, "Please Login First", {"redirect": "/login"}
+            False,
+            "Please Login First",
+            {"redirect": url_for("resources.auth.login")},
         )
     return redirect("/login")
 
@@ -81,6 +84,7 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
 @jwt.invalid_token_loader
 @jwt.unauthorized_loader
 def jwt_exception_handler(_):
+    print(_)
     return redirect_to_login()
 
 
@@ -96,8 +100,7 @@ def refresh_expiring_jwts(response):
     try:
         token = get_jwt()
         exp_timestamp = token["exp"]
-        now = datetime.now(timezone(timedelta(hours=+8)))
-        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        target_timestamp = datetime.timestamp(now() + timedelta(minutes=30))
         if target_timestamp > exp_timestamp:
             access_token = create_access_token(identity=current_user.user)
             set_access_cookies(response, access_token)

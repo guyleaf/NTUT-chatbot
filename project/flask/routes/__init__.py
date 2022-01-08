@@ -1,4 +1,5 @@
-﻿from flask import request, redirect, url_for
+﻿import json
+from flask import request, redirect, url_for
 from flask.blueprints import Blueprint
 
 from .auth import auth_resource
@@ -14,5 +15,6 @@ resources.register_blueprint(favorites_resource)
 
 @resources.route("/redirect")
 def redirect_route():
-    page = request.args.get("page")
-    return redirect(url_for(page) if page else "/")
+    args = request.args.to_dict()
+    page = args.get("page")
+    return redirect(url_for(page, **json.loads(args["args"])) if page else "/")

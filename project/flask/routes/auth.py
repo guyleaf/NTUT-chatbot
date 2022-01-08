@@ -53,7 +53,7 @@ def auth():
     response = redirect(
         url_for(
             "resources.redirect_route",
-            page=session.get("last_watched_protected_page"),
+            **session.get("last_watched_endpoint", {}),
         )
     )
     set_access_cookies(response, access_token)

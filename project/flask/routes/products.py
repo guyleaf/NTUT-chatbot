@@ -1,11 +1,11 @@
-﻿from flask import request, Blueprint, render_template, abort
-from flask_jwt_extended import current_user
+﻿from flask import request, Blueprint, render_template, redirect, url_for
+from flask_jwt_extended import current_user, get_jwt
 
 from app import firestoreDAO
 from decorators import roles_accepted
-from helpers import make_api_response
+from helpers import make_api_response, now
 
-from schemas import search_args_schema
+from schemas import search_args_schema, product_schema
 from responses import bad_request_message_for_api
 
 
@@ -76,15 +76,68 @@ def search_products():
 @products_resource.route("/<product_id>", methods=["GET"])
 @roles_accepted(["customer", "seller"], remember_endpoint=True)
 def product_page(product_id):
-    product = firestoreDAO.get_products_by_id(product_id)
+    product = firestoreDAO.get_product_by_id(product_id)
 
     if product is None:
-        return abort(404)
+        return redirect(url_for("resources.products.search_page"))
 
     return render_template(
         "products/product.html",
         product=product,
         is_seller=current_user.is_seller(),
+        csrf_token=get_jwt()["csrf"],
+    )
+
+
+@products_resource.route("/<product_id>", methods=["POST"])
+@roles_accepted(["seller"])
+def update_product(product_id):
+    new_product = request.form.to_dict()
+    errors = product_schema.validate(new_product)
+    if errors:
+        return (
+            make_api_response(False, bad_request_message_for_api, errors),
+            400,
+        )
+
+    new_product = product_schema.load(new_product)
+    old_product = firestoreDAO.get_product_by_id(product_id)
+    if old_product is None:
+        return redirect(url_for("resources.products.search_page"))
+
+    image = new_product.pop("image", None)
+    if image:
+        # Upload image
+        pass
+
+    new_status = new_product.pop("status")
+    old_status = old_product.pop("status")
+    # 取差集
+    modified_contents = set(new_product.items()) - set(old_product.items())
+    modified_status = set(new_status.items()) - set(old_status.items())
+    if len(modified_contents) > 0 or len(modified_status) > 0:
+        modified_contents = {key: value for key, value in modified_contents}
+        modified_status = {
+            f"status.{key}": value for key, value in modified_status
+        }
+        modified_contents.update(modified_status)
+        modified_contents.setdefault("updated_time", now().timestamp())
+
+        firestoreDAO.update_product(product_id, modified_contents)
+
+    return redirect(
+        url_for("resources.products.product_page", product_id=product_id)
+    )
+
+
+@products_resource.route("/<product_id>", methods=["DELETE"])
+@roles_accepted(["seller"])
+def delete_product(product_id):
+    firestoreDAO.delete_product(product_id)
+    return make_api_response(
+        True,
+        "Delete Successfully",
+        {"redirect": url_for("resources.products.search_page")},
     )
 
 

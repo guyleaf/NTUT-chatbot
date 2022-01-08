@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set title = "編輯商品" if is_seller else "商品資訊" %}
-{% set action = "{{ url_for('resources.products.product_page', product_id=product.id) }}" if is_seller else "/orders" %}
-{% set method = "PUT" if is_seller else "POST"%}
+{% set action = url_for("resources.products.update_product", product_id=product.id) if is_seller else "/orders" %}
+{% set method = "POST" %}
 
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
@@ -15,36 +15,50 @@
             alt="Product image"
         />
     </div>
-    <form action="{{ action }}" method="{{ method }}">
+    <label hidden id="product_url">{{ url_for("resources.products.delete_product", product_id=product.id) }}</label>
+    <form id="product_form" action="{{ action }}" method="{{ method }}" novalidate>
+        <input hidden name="csrf_token" value="{{ csrf_token }}">
         <div class="row justify-content-md-center mb-3">
             <label for="name" class="col-sm-3 col-form-label">名稱：</label>
             <div class="col">
-                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" id="name" name="name" value="{{ product.name }}" {{ 'readonly' if not is_seller else '' }}>
+                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" id="name" name="name" value="{{ product.name }}" {{ 'readonly' if not is_seller else 'required' }}>
+                <div class="invalid-feedback">
+                    商品名稱不可為空
+                </div>
             </div>
         </div>
         <div class="row justify-content-md-center mb-3">
             <label for="brand" class="col-sm-3 col-form-label">品牌：</label>
             <div class="col">
-                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" name="brand" value="{{ product.brand }}" {{ 'readonly' if not is_seller else '' }}>
+                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" id="brand" name="brand" value="{{ product.brand }}" {{ 'readonly' if not is_seller else 'required' }}>
+                <div class="invalid-feedback">
+                    品牌名稱不可為空
+                </div>
             </div>
         </div>
-        <div class="row justify-content-md-center mb-3">
+        <!-- <div class="row justify-content-md-center mb-3">
             <label for="description" class="col-sm-3 col-form-label">說明：</label>
             <div class="col">
-                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" name="description" value="{{ product.description }}" {{ 'readonly' if not is_seller else '' }}>
+                <textarea rows="3" class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="text" name="description" {{ 'readonly' if not is_seller else '' }}>{{ product.description }}</textarea>
             </div>
-        </div>
+        </div> -->
         <div class="row justify-content-md-center mb-3">
             <label for="price" class="col-sm-3 col-form-label">商店價格：</label>
             <div class="col">
-                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="number" name="price" value="{{ product.price }}" {{ 'readonly' if not is_seller else '' }}>
+                <input class="{{ 'form-control-plaintext' if not is_seller else 'form-control' }}" type="number" id="price" name="price" value="{{ product.price }}" min="0" {{ 'readonly' if not is_seller else 'required' }}>
+            </div>
+            <div class="invalid-feedback">
+                商品價格不可小於 0 且不可為空
             </div>
         </div>
         <div class="row justify-content-md-center mb-3">
             <label for="quantity" class="col-sm-3 col-form-label">剩餘數量：</label>
             <div class="col">
                 {% if is_seller %}
-                    <input class="form-control" type="number" name="quantity" value="{{ product.status.quantity }}">
+                    <input class="form-control" type="number" id="quantity" name="quantity" value="{{ product.status.quantity }}" min="0" required>
+                    <div class="invalid-feedback">
+                        剩餘數量不可小於 0 且不可為空
+                    </div>
                 {% else %}
                     {% if product.status.quantity > 0 %}
                         <label class="align-middle fw-bold text-success">{{ product.status.quantity }}</label>
@@ -58,16 +72,19 @@
             <div class="row justify-content-md-center mb-3">
                 <label for="quantity" class="col-sm-3 col-form-label">購買數量：</label>
                 <div class="col">
-                    <input class="form-control" type="number" name="quantity">
+                    <input class="form-control" type="number" id="quantity" name="quantity" min="1" value="1" required>
+                    <div class="invalid-feedback">
+                        購買數量不可小於 1
+                    </div>
                 </div>
             </div>
         {% endif %}
 
         {% if is_seller %}
             <div class="row justify-content-md-center mb-3">
-                <label for="quantity" class="col-sm-3 col-form-label">商品狀態：</label>
+                <label for="is_available" class="col-sm-3 col-form-label">商品狀態：</label>
                 <div class="col">
-                    <select class="form-select" aria-label="is product available">
+                    <select class="form-select" id="is_available" name="is_available" aria-label="is product available" required>
                         <option {{ 'selected' if product.status.is_available else '' }} value="true">上架中</option>
                         <option {{ 'selected' if not product.status.is_available else '' }} value="false">下架中</option>
                     </select>
@@ -82,7 +99,7 @@
                 </div>
                 {% if is_seller %}
                     <div class="col text-center">
-                        <button class="btn btn-danger" type="submit">刪除</button>
+                        <button id="deleteButton" class="btn btn-danger" type="button">刪除</button>
                     </div>
                 {% endif %}
                 <div class="col text-center">

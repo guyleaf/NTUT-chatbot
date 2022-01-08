@@ -35,6 +35,17 @@ class FirestoreDAO:
             query.offset(skip).limit(take).order_by("name").stream(),
         )
 
+    def _get_product_document_by_id(
+        self, product_id: str
+    ) -> firestore.firestore.DocumentSnapshot:
+        products = (
+            self._db.collection_group("product_items")
+            .where("company_id", "==", company_id)
+            .where("id", "==", product_id)
+            .get()
+        )
+        return products[0] if len(products) != 0 else None
+
     def _get_products_stream_by_ids(self, product_ids: "list[str]"):
         return (
             self._db.collection_group("product_items")
@@ -65,9 +76,9 @@ class FirestoreDAO:
             product.to_dict() for product in results
         ]
 
-    def get_products_by_id(self, product_id: str) -> "dict[str, Any]":
-        results = self.get_products_by_ids([product_id])
-        return results[0] if len(results) != 0 else None
+    def get_product_by_id(self, product_id: str) -> "dict[str, Any]":
+        result = self._get_product_document_by_id(product_id).to_dict()
+        return result
 
     def get_products_by_ids(
         self, product_ids: "list[str]"
@@ -93,13 +104,8 @@ class FirestoreDAO:
         )
 
     def is_product_existed(self, product_id: str) -> bool:
-        products_collection = (
-            self._db.collection_group("product_items")
-            .where("company_id", "==", company_id)
-            .where("id", "==", product_id)
-            .get()
-        )
-        return len(products_collection) == 1
+        product = self._get_product_document_by_id(product_id)
+        return product is not None
 
     def add_favorite(self, user_id: str, product_id: str):
         user_document = self._db.document(
@@ -162,12 +168,24 @@ class FirestoreDAO:
         order_doc = self._db.document(f"orders/{order_id}")
         order_doc.set(order_info)
 
-    # stockManagement
     def add_product(self, product_info):
         self._db.collection("products").add(product_info)
 
-    # stockManagement
-    def update_product(self, product_info):
-        product_id = product_info["product_id"]
-        product_doc = self._db.document(f"products/{product_id}")
-        product_doc.set(product_info)
+    def delete_product(self, product_id):
+        product = self._get_product_document_by_id(product_id)
+        if product:
+            product.reference.delete()
+
+    def update_product(self, product_id: str, product: "dict[str, Any]"):
+        transaction = self._db.transaction()
+        product_ref = self._get_product_document_by_id(product_id).reference
+
+        @firestore.firestore.transactional
+        def update_product(
+            transaction: firestore.firestore.Transaction,
+            product_ref: firestore.firestore.DocumentReference,
+            modified_contents: "dict[str, Any]",
+        ):
+            transaction.update(product_ref, modified_contents)
+
+        update_product(transaction, product_ref, product)

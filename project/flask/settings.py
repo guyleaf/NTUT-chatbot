@@ -43,3 +43,4 @@ class FlaskSettings:
     )
     JWT_TOKEN_LOCATION = ["cookies", "headers"]
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_CSRF_CHECK_FORM = True
