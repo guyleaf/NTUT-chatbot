@@ -1,13 +1,10 @@
 {% extends "base.html" %}
-{% set title = "編輯商品" if is_seller else "商品資訊" %}
-{% set action = url_for("resources.products.update_product", product_id=product.id) if is_seller else "/orders" %}
-{% set method = "POST" %}
 
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="container">
+<div class="container mt-3 mb-5">
     <h1 class="title">{{ title }}</h1>
-    <div class="text-center mb-3">
+    <div class="text-center my-3">
         <img
             class="img-thumbnail"
             src="{{ product.image_url }}"
@@ -74,7 +71,7 @@
                 <div class="col">
                     <input class="form-control" type="number" id="quantity" name="quantity" min="1" value="1" required>
                     <div class="invalid-feedback">
-                        購買數量不可小於 1
+                        購買數量不可小於 1 且不可為空
                     </div>
                 </div>
             </div>
@@ -92,22 +89,31 @@
             </div>
         {% endif %}
 
-        <div class="row justify-content-md-center mb-5">
-            {% if is_seller or product.status.quantity > 0 %}
+        <div class="row justify-content-md-center">
+            {% if is_seller %}
                 <div class="col text-center">
-                    <button class="btn btn-primary" type="submit">{{ '更新' if is_seller else '購買' }}</button>
+                    <button class="btn btn-primary" type="submit">{{ '新增' if new_product else '更新' }}</button>
                 </div>
-                {% if is_seller %}
+            {% elif product.status.quantity > 0 %}
+                <div class="col text-center">
+                    <button class="btn btn-primary" type="submit">購買</button>
+                </div>
+            {% endif %}
+            {% if is_seller %}
+                {% if new_product %}
                     <div class="col text-center">
+                        <a role="button" class="btn btn-danger" href="{{ url_for('resources.products.search_page') }}">取消</a>
+                    </div>
+                {% else %}
+                    <div class="col text-center">
+                        <label hidden id="returnUrl">{{ url_for(return_endpoint) }}</label>
                         <button id="deleteButton" class="btn btn-danger" type="button">刪除</button>
                     </div>
                 {% endif %}
+            {% endif %}
+            {% if not new_product %}
                 <div class="col text-center">
-                    <a role="button" class="btn btn-secondary" href="{{ url_for('resources.products.search_page') }}">取消</a>
-                </div>
-            {% else %}
-                <div class="col text-center">
-                    <a role="button" class="btn btn-primary" href="{{ url_for('resources.products.search_page') }}">返回搜尋頁面</a>
+                    <a role="button" class="btn btn-secondary" href="{{ url_for(return_endpoint) }}">返回</a>
                 </div>
             {% endif %}
         </div>

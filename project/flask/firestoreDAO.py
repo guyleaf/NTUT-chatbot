@@ -1,3 +1,4 @@
+import random
 from typing import Any
 from firebase_admin import firestore, initialize_app
 
@@ -77,8 +78,8 @@ class FirestoreDAO:
         ]
 
     def get_product_by_id(self, product_id: str) -> "dict[str, Any]":
-        result = self._get_product_document_by_id(product_id).to_dict()
-        return result
+        result = self._get_product_document_by_id(product_id)
+        return result.to_dict() if result else None
 
     def get_products_by_ids(
         self, product_ids: "list[str]"
@@ -168,13 +169,45 @@ class FirestoreDAO:
         order_doc = self._db.document(f"orders/{order_id}")
         order_doc.set(order_info)
 
-    def add_product(self, product_info):
-        self._db.collection("products").add(product_info)
+    def add_product(self, product: "dict[str, Any]") -> int:
+        transaction = self._db.transaction()
+        # count shards
+        products_collection = self._db.collection(
+            f"companies/{company_id}/products"
+        )
+        total_shards = sum(1 for _ in products_collection.stream())
+
+        shard_index = random.randint(0, total_shards - 1)
+        shard_ref = self._db.document(
+            f"companies/{company_id}/products/{shard_index}"
+        )
+
+        product_ref = self._db.collection(
+            f"companies/{company_id}/products/{shard_index}/product_items"
+        ).document()
+        product.setdefault("id", product_ref.id)
+        product.setdefault("company_id", company_id)
+        product["status"].setdefault("is_deleted", False)
+
+        @firestore.firestore.transactional
+        def add_product(
+            transaction: firestore.firestore.Transaction,
+            shard_ref: firestore.firestore.DocumentReference,
+            product_ref: firestore.firestore.DocumentReference,
+            product: "dict[str, Any]",
+        ):
+            transaction.create(product_ref, product)
+            transaction.update(
+                shard_ref, {"count": firestore.firestore.Increment(1)}
+            )
+
+        add_product(transaction, shard_ref, product_ref, product)
+        return product["id"]
 
     def delete_product(self, product_id):
         product = self._get_product_document_by_id(product_id)
         if product:
-            product.reference.delete()
+            product.reference.set({"status.is_deleted": True})
 
     def update_product(self, product_id: str, product: "dict[str, Any]"):
         transaction = self._db.transaction()

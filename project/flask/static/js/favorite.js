@@ -1,6 +1,13 @@
 function setupFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForAdd, callbackForDelete) {
+  unbindFavoriteFunction(addButtonTarget, removeButtonTarget);
   setupAddFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForAdd);
   setupDeleteFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForDelete);
+}
+
+function unbindFavoriteFunction(addButtonTarget, removeButtonTarget) {
+  const eventName = "click";
+  window.helpers.unbindEvent(addButtonTarget, eventName);
+  window.helpers.unbindEvent(removeButtonTarget, eventName);
 }
 
 function setupAddFavoriteFunction(addButtonTarget, removeButtonTarget, callback) {

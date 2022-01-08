@@ -66,10 +66,11 @@ $(function () {
         if (contentType === "application/json") {
           window.helpers.handleJsonResponse(data);
         }
-        else {
-          $("#searchResult > .results").append(data);
-          total = getTotal();
-        }
+
+        $("#searchResult > .results").append(data);
+        total = getTotal();
+
+        setupFavoriteFunction(".addFavoriteButton", ".deleteFavoriteButton");
       })
       .fail(window.helpers.handleErrorResponse);
   }

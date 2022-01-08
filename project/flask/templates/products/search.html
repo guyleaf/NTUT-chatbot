@@ -5,6 +5,11 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5 text-center">{{ title }}</h1>
+    {% if not is_customer %}
+        <div class="text-end">
+            <a class="btn btn-primary" href="{{ url_for('resources.products.new_product_page') }}">新增商品</a>
+        </div>
+    {% endif %}
     <form id="searchForm" class="input-group mt-3 mb-3" action="javascript:void(0);">
         <input
             id="searchTextbox"

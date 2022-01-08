@@ -2,7 +2,7 @@
   const Helpers = (function () {
     let Helpers = function () { }
     Helpers.prototype.handleJsonResponse = (data) => {
-      if (!data.success && data.data.redirect) {
+      if (data.data && data.data.redirect) {
         window.location.replace(data.data.redirect)
       }
     }
@@ -22,6 +22,10 @@
         contentType: "application/json; charset=UTF-8",
         dataType: dataType
       });
+    }
+
+    Helpers.prototype.unbindEvent = (target, eventName) => {
+      $(target).unbind(eventName);
     }
 
     function getCsrfToken() {

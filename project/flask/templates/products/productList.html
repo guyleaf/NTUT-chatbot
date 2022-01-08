@@ -4,6 +4,7 @@
 {% set can_buy = not product_status.is_deleted and product_status.is_available and product_status.quantity > 0 %}
 {% set purchase_button_enabled = is_seller or can_buy %}
 {% set purchase_button_text = "編輯" if is_seller else ("購買" if can_buy else "無法購買") %}
+{% set return_endpoint = return_endpoint or "resources.products.search_page" %}
 
 <div class="col">
     <div class="card">
@@ -38,7 +39,7 @@
                 <a
                     role="button"
                     class="btn btn-primary"
-                    href="{{ url_for('resources.products.product_page', product_id=product_id) }}"
+                    href="{{ url_for('resources.products.product_page', product_id=product_id, return_endpoint=return_endpoint) }}"
                 >
                     {{ purchase_button_text }}
                 </a>

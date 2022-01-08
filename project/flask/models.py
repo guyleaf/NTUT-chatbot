@@ -23,3 +23,16 @@ class TokenBlocklist(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     jti = db.Column(db.String(36), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
+
+
+class ProductStatus:
+    quantity = 1
+    is_available = True
+
+
+class Product:
+    name = ""
+    brand = ""
+    price = 0
+    status = ProductStatus()
+    image_url = None

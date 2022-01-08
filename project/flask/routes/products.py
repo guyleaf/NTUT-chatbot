@@ -4,6 +4,7 @@ from flask_jwt_extended import current_user, get_jwt
 from app import firestoreDAO
 from decorators import roles_accepted
 from helpers import make_api_response, now
+from models import Product
 
 from schemas import search_args_schema, product_schema
 from responses import bad_request_message_for_api
@@ -81,10 +82,19 @@ def product_page(product_id):
     if product is None:
         return redirect(url_for("resources.products.search_page"))
 
+    template_name = None
+    if current_user.is_seller():
+        template_name = "products/updateProduct.html"
+    else:
+        template_name = "products/viewProduct.html"
+
+    return_endpoint = request.args.get(
+        "return_endpoint", "resources.products.search_page"
+    )
     return render_template(
-        "products/product.html",
+        template_name,
         product=product,
-        is_seller=current_user.is_seller(),
+        return_endpoint=return_endpoint,
         csrf_token=get_jwt()["csrf"],
     )
 
@@ -134,16 +144,50 @@ def update_product(product_id):
 @roles_accepted(["seller"])
 def delete_product(product_id):
     firestoreDAO.delete_product(product_id)
-    return make_api_response(
-        True,
-        "Delete Successfully",
-        {"redirect": url_for("resources.products.search_page")},
-    )
+    return make_api_response(True, "Delete Successfully")
 
 
 # seller
 @products_resource.route("/", methods=["GET"])
 @roles_accepted(["seller"], remember_endpoint=True)
 def new_product_page():
-    title = "新增商品"
-    return render_template("productManagement.html", **locals())
+    product = Product()
+    # example
+    # TODO: add upload image feature
+    product.image_url = (
+        "https://f.ecimg.tw/items/DRAD1K1900C81G9/000001_1640828679.jpg"
+    )
+
+    return render_template(
+        "products/newProduct.html",
+        product=product,
+        csrf_token=get_jwt()["csrf"],
+    )
+
+
+@products_resource.route("/", methods=["POST"])
+@roles_accepted(["seller"])
+def add_product():
+    new_product = request.form.to_dict()
+    errors = product_schema.validate(new_product)
+    if errors:
+        return (
+            make_api_response(False, bad_request_message_for_api, errors),
+            400,
+        )
+
+    new_product = product_schema.load(new_product)
+    # TODO: Add these features to updating and adding page
+    new_product.setdefault("description", "")
+    new_product.setdefault(
+        "image_url",
+        "https://f.ecimg.tw/items/DRAD1K1900C81G9/000001_1640828679.jpg",
+    )
+    new_product.setdefault("created_time", now().timestamp())
+    new_product.setdefault("updated_time", now().timestamp())
+
+    product_id = firestoreDAO.add_product(new_product)
+
+    return redirect(
+        url_for("resources.products.product_page", product_id=product_id)
+    )

@@ -9,14 +9,16 @@ $(function () {
     form.addClass("was-validated");
   });
 
-  const product_url = $("#product_url").val();
+  const returnUrl = $("#returnUrl").text();
+  const productUrl = $("#product_url").text();
   $("#deleteButton").click(function (e) {
     e.preventDefault();
-    window.helpers.ajax("DELETE", product_url, JSON.stringify({}))
+
+    window.helpers.ajax("DELETE", productUrl, JSON.stringify({}))
       .done(function (data) {
         window.helpers.handleJsonResponse(data);
-
-        window.location.replace("/products/search");
+        console.log(data);
+        window.location.href = returnUrl;
       })
       .fail(window.helpers.handleErrorResponse);
   });
