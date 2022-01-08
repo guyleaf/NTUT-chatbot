@@ -65,6 +65,10 @@ class FirestoreDAO:
             product.to_dict() for product in results
         ]
 
+    def get_products_by_id(self, product_id: str) -> "dict[str, Any]":
+        results = self.get_products_by_ids([product_id])
+        return results[0] if len(results) != 0 else None
+
     def get_products_by_ids(
         self, product_ids: "list[str]"
     ) -> "list[dict[str, Any]]":
@@ -98,7 +102,9 @@ class FirestoreDAO:
         return len(products_collection) == 1
 
     def add_favorite(self, user_id: str, product_id: str):
-        user_document = self._db.document(f"users/{user_id}")
+        user_document = self._db.document(
+            f"companies/{company_id}/users/{user_id}"
+        )
         user_document.update(
             {
                 "favorite_product_ids": firestore.firestore.ArrayUnion(
@@ -108,7 +114,9 @@ class FirestoreDAO:
         )
 
     def delete_favorite(self, user_id: str, product_id: str):
-        user_document = self._db.document(f"users/{user_id}")
+        user_document = self._db.document(
+            f"companies/{company_id}/users/{user_id}"
+        )
         user_document.update(
             {
                 "favorite_product_ids": firestore.firestore.ArrayRemove(

@@ -1,5 +1,5 @@
-﻿from flask import request, Blueprint, render_template
-from flask_jwt_extended import jwt_required, current_user
+﻿from flask import request, Blueprint, render_template, abort
+from flask_jwt_extended import current_user
 
 from app import firestoreDAO
 from decorators import roles_accepted
@@ -18,8 +18,7 @@ products_resource = Blueprint(
 
 
 @products_resource.route("/search", methods=["GET"])
-@jwt_required()
-@roles_accepted(["customer", "seller"])
+@roles_accepted(["customer", "seller"], remember_endpoint=True)
 def search_page():
     return render_template(
         "products/search.html", is_customer=current_user.is_customer()
@@ -27,7 +26,6 @@ def search_page():
 
 
 @products_resource.route("/search", methods=["POST"])
-@jwt_required()
 @roles_accepted(["customer", "seller"])
 def search_products():
     search_args = request.get_json(force=True)
@@ -76,19 +74,23 @@ def search_products():
 
 
 @products_resource.route("/<product_id>", methods=["GET"])
-@jwt_required()
-@roles_accepted(["customer", "seller"])
+@roles_accepted(["customer", "seller"], remember_endpoint=True)
 def product_page(product_id):
-    products = firestoreDAO.get_products_by_ids([product_id])
+    product = firestoreDAO.get_products_by_id(product_id)
 
-    if len(products) == 0:
-        return
-    return f"Product ID: {product_id}"
+    if product is None:
+        return abort(404)
+
+    return render_template(
+        "products/product.html",
+        product=product,
+        is_seller=current_user.is_seller(),
+    )
 
 
 # seller
 @products_resource.route("/", methods=["GET"])
-def new_product_page(user_id):
-    title = "商品管理"
-    produtcts = firestoreDAO.get_products(user_id)
+@roles_accepted(["seller"], remember_endpoint=True)
+def new_product_page():
+    title = "新增商品"
     return render_template("productManagement.html", **locals())

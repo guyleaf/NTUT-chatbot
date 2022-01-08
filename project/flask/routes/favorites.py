@@ -1,6 +1,5 @@
 ﻿from flask import Blueprint, request, render_template
 from flask_jwt_extended import current_user
-from flask_jwt_extended.view_decorators import jwt_required
 
 from app import firestoreDAO
 from decorators import roles_accepted
@@ -21,9 +20,8 @@ favorites_resource = Blueprint(
 
 
 @favorites_resource.route("/myFavorites", methods=["GET"])
-@jwt_required()
-@roles_accepted(["customer", "seller"])
-def get_my_favorite_page():
+@roles_accepted(["customer", "seller"], remember_endpoint=True)
+def my_favorites_page():
     products = firestoreDAO.get_favorite_products(current_user.user.id)
 
     product_infos = [
@@ -34,11 +32,11 @@ def get_my_favorite_page():
         "myFavorites.html",
         product_infos=product_infos,
         total=len(product_infos),
+        is_seller=current_user.is_seller()
     )
 
 
 @favorites_resource.route("/myFavorites", methods=["POST", "DELETE"])
-@jwt_required()
 @roles_accepted(["customer", "seller"])
 def add_favorite():
     body = request.get_json(force=True)

@@ -1,62 +1,47 @@
-function setupFavoriteFunction(callbackForAdd, callbackForDelete) {
-  setupAddFavoriteFunction(callbackForAdd);
-  setupDeleteFavoriteFunction(callbackForDelete);
+function setupFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForAdd, callbackForDelete) {
+  setupAddFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForAdd);
+  setupDeleteFavoriteFunction(addButtonTarget, removeButtonTarget, callbackForDelete);
 }
 
-function setupAddFavoriteFunction(callback) {
+function setupAddFavoriteFunction(addButtonTarget, removeButtonTarget, callback) {
   let addFavoriteModal = new bootstrap.Modal(
     document.getElementById("addFavoriteSuccessHint")
   );
-  $(".addFavoriteButton").click(function (e) {
+  $(addButtonTarget).click(function (e) {
     e.preventDefault();
     const productId = $(e.target).data("product-id");
-    $.ajax({
-      type: "POST",
-      url: "/myFavorites",
-      headers: {
-        'X-CSRF-TOKEN': getCsrfToken()
-      },
-      data: JSON.stringify({ product_id: productId }),
-      contentType: "application/json; charset=UTF-8"
-    })
-      .done(function (_) {
-        console.log("success");
+    window.helpers.ajax("POST", "/myFavorites", JSON.stringify({ product_id: productId }))
+      .done(function (data) {
+        window.helpers.handleJsonResponse(data);
         $(e.target).hide();
-        $(e.target).siblings(".deleteFavoriteButton").show();
+        $(e.target).siblings(removeButtonTarget).show();
         addFavoriteModal.show();
       })
       .fail(function (error) {
-        console.error(error);
+        window.helpers.handleErrorResponse(error);
       });
   });
 
   _addEventListenersForClosed("addFavoriteSuccessHint", callback);
 }
 
-function setupDeleteFavoriteFunction(callback) {
+function setupDeleteFavoriteFunction(addButtonTarget, removeButtonTarget, callback) {
   let deleteFavoriteModal = new bootstrap.Modal(
     document.getElementById("deleteFavoriteSuccessHint")
   );
-  $(".deleteFavoriteButton").click(function (e) {
+  $(removeButtonTarget).click(function (e) {
     e.preventDefault();
     const productId = $(e.target).data("product-id");
-    $.ajax({
-      type: "DELETE",
-      url: "/myFavorites",
-      headers: {
-        'X-CSRF-TOKEN': getCsrfToken()
-      },
-      data: JSON.stringify({ product_id: productId }),
-      contentType: "application/json; charset=UTF-8"
-    })
-      .done(function (_) {
-        console.log("success");
+    window.helpers.ajax("DELETE", "/myFavorites", JSON.stringify({ product_id: productId }))
+      .done(function (data) {
+        window.helpers.handleJsonResponse(data);
+
         $(e.target).hide();
-        $(e.target).siblings(".addFavoriteButton").show();
+        $(e.target).siblings(addButtonTarget).show();
         deleteFavoriteModal.show();
       })
       .fail(function (error) {
-        console.error(error);
+        window.helpers.handleErrorResponse(error);
       });
   });
 

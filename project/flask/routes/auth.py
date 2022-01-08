@@ -1,14 +1,7 @@
 ﻿import secrets
 from datetime import datetime, timedelta, timezone
-from flask import (
-    Blueprint,
-    url_for,
-    request,
-    abort,
-    redirect,
-)
+from flask import Blueprint, url_for, request, abort, redirect, session
 from flask_jwt_extended import (
-    jwt_required,
     create_access_token,
     set_access_cookies,
     unset_jwt_cookies,
@@ -17,8 +10,8 @@ from flask_jwt_extended import (
 from flask_jwt_extended.utils import get_jwt
 
 from app import oauth_client, db, firestoreDAO
+from decorators import jwt_required
 from models import Role, TokenBlocklist, User
-from helpers import get_redirect_data
 
 auth_resource = Blueprint("auth", __name__, static_folder="templates")
 
@@ -58,7 +51,10 @@ def auth():
 
     access_token = create_access_token(identity=user_data)
     response = redirect(
-        url_for("resources.redirect_route", **get_redirect_data())
+        url_for(
+            "resources.redirect_route",
+            page=session.get("last_watched_protected_page"),
+        )
     )
     set_access_cookies(response, access_token)
     return response
@@ -79,7 +75,7 @@ def logout():
 
 
 @auth_resource.route("/me", methods=["GET"])
-@jwt_required()
+@jwt_required(remember_endpoint=True)
 def my_info():
     return {
         "id": current_user.user.id,

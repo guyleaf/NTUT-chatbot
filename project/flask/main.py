@@ -17,7 +17,7 @@ from dtos import UserInfo
 from exceptions import UnauthorizedAccessException
 from models import TokenBlocklist, User
 from routes import resources
-from helpers import save_redirect_data, make_api_response
+from helpers import make_api_response
 
 
 @app.before_first_request
@@ -62,7 +62,6 @@ def check_if_token_revoked(_, jwt_payload):
 
 
 def redirect_to_login():
-    save_redirect_data(request.url_rule.endpoint)
     if request.content_type and "application/json" in request.content_type:
         return make_api_response(
             False, "Please Login First", {"redirect": "/login"}
@@ -82,7 +81,6 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
 @jwt.invalid_token_loader
 @jwt.unauthorized_loader
 def jwt_exception_handler(_):
-    save_redirect_data(request.url_rule.endpoint)
     return redirect_to_login()
 
 
@@ -90,7 +88,6 @@ def jwt_exception_handler(_):
 @jwt.user_lookup_error_loader
 @jwt.expired_token_loader
 def token_handler(_jwt_header, _jwt_payload):
-    save_redirect_data(request.url_rule.endpoint)
     return redirect_to_login()
 
 

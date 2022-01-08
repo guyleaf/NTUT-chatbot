@@ -23,20 +23,12 @@ $(function () {
     keyword = $("#searchTextbox").val();
     requestBody["keyword"] = keyword;
 
-    $.ajax({
-      type: "POST",
-      url: "/products/search",
-      headers: {
-        'X-CSRF-TOKEN': getCsrfToken()
-      },
-      data: JSON.stringify(requestBody),
-      contentType: "application/json; charset=UTF-8"
-    })
+    window.helpers.ajax("POST", "/products/search", JSON.stringify(requestBody), "html")
       .done(function (data, _, xhr) {
         let contentType = xhr.getResponseHeader("Content-Type");
 
         if (contentType === "application/json") {
-          handleJsonResponse(data)
+          window.helpers.handleJsonResponse(data);
         }
         else {
           $("#searchResult > .results").html(data);
@@ -46,11 +38,11 @@ $(function () {
             $("#resultsNotFoundMessage").show();
           }
 
-          setupFavoriteFunction();
+          setupFavoriteFunction(".addFavoriteButton", ".deleteFavoriteButton");
           isSearched = true;
         }
       })
-      .fail(handleErrorResponse);
+      .fail(window.helpers.handleErrorResponse);
   });
 
   $("#scrollToTopButton").click(function (e) {
@@ -67,28 +59,19 @@ $(function () {
   function addNewResults() {
     requestBody["skip"] += take;
 
-    $.ajax({
-      type: "POST",
-      url: "/products/search",
-      headers: {
-        'X-CSRF-TOKEN': getCsrfToken()
-      },
-      data: JSON.stringify(requestBody),
-      contentType: "application/json; charset=UTF-8",
-      dataType: "html"
-    })
+    window.helpers.ajax("POST", "/products/search", JSON.stringify(requestBody), "html")
       .done(function (data, _, xhr) {
         let contentType = xhr.getResponseHeader("Content-Type");
 
         if (contentType === "application/json") {
-          handleJsonResponse(data)
+          window.helpers.handleJsonResponse(data);
         }
         else {
           $("#searchResult > .results").append(data);
           total = getTotal();
         }
       })
-      .fail(handleErrorResponse);
+      .fail(window.helpers.handleErrorResponse);
   }
 
   function getTotal() {
