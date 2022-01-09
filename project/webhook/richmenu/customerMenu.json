@@ -16,7 +16,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/products/search"
+                "uri": "/products/search?openExternalBrowser=1"
             }
         },
         {
@@ -28,7 +28,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/myFavorites"
+                "uri": "/myFavorites?openExternalBrowser=1"
             }
         },
         {
@@ -40,7 +40,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/orders"
+                "uri": "/orders?openExternalBrowser=1"
             }
         },
         {
@@ -52,7 +52,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/report"
+                "uri": "/report?openExternalBrowser=1"
             }
         }
     ]
