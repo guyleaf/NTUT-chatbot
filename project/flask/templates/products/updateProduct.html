@@ -1,5 +1,5 @@
 ﻿{% set title = "編輯商品" %}
-{% set action = url_for("resources.products.update_product", product_id=product.id) %}
+{% set action = url_for("resources.products.update_product", product_id=product.id, return_endpoint=return_endpoint) %}
 {% set method = "POST" %}
 {% set is_seller = true %}
 {% set new_product = false %}

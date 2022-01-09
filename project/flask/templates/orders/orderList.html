@@ -1,0 +1,84 @@
+﻿{% extends "base.html" %}
+{% set title = "訂單管理" if is_seller else "訂單紀錄" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mt-5 text-center">{{ title }}</h1>
+    <div class="table-responsive-md">
+        <table id="orderTable" class="table table-hover">
+            <caption hidden>An order list</caption>
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">購買時間</th>
+                    <th scope="col">商品名稱/商品編號</th>
+                    <th scope="col">商品單價</th>
+                    <th scope="col">數量</th>
+                    <th scope="col">商品總價</th>
+                    <th scope="col">訂單狀態</th>
+                    <th scope="col">訂單管理</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <th scope="row" class="created_time">
+                        {{ order.created_time.strftime("%Y-%m-%d") }}
+                        <br>
+                        {{ order.created_time.strftime("%H:%M:%S") }}
+                    </th>
+                    <td class="name">
+                        <a class="link-primary" href="{{ url_for('resources.products.product_page', product_id=order.product_id) }}">
+                            {{ order.product_name }}
+                        </a>
+                        <span class="text-muted">({{ order.product_id }})</span>
+                    </td>
+                    <td class="price">{{ order.price }}</td>
+                    <td class="quantity">{{ order.quantity }}</td>
+                    <td class="total">{{ order.price * order.quantity }}</td>
+                    <td class="fw-bold status">
+                        {% if order.status.is_confirmed :%}
+                        <span style="color: blue">準備中</span>
+                        {% elif order.status.is_prepared %}
+                        <span style="color: rgb(168, 168, 16)">物流運送中</span>
+                        {% elif order.status.is_finished %}
+                        <span style="color: green">訂單已完成</span>
+                        {% elif order.status.is_cancelled %}
+                        <span style="color: red">訂單已取消</span>
+                        {% else %}
+                        訂單尚未確認
+                        {% endif %}
+                    </td>
+                    {% if is_seller %}
+                    <td class="fw-bold status">
+                        {% if order.status.is_confirmed :%}
+                        <button class="btn btn-warning btn-sm" type="button" data-order-id="{{ order.id }}" data-value="1">列印物流單</button>
+                        {% elif not (order.status.values() | sum) %}
+                        <button class="btn btn-primary btn-sm" type="button" data-order-id="{{ order.id }}" data-value="0">確認訂單</button>
+                        <div class="my-1"></div>
+                        <button class="btn btn-danger btn-sm" type="button" data-order-id="{{ order.id }}" data-value="3">取消訂單</button>
+                        {% endif %}
+                    </td>
+                    {% else %}
+                    <td class="fw-bold status">
+                        {% if order.status.is_prepared %}
+                        <button class="btn btn-success btn-sm" type="button" data-order-id="{{ order.id }}" data-value="2">完成訂單</button>
+                        {% elif not (order.status.values() | sum) %}
+                        <button class="btn btn-danger btn-sm" type="button" data-order-id="{{ order.id }}" data-value="3">取消訂單</button>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    <script
+        type="text/javascript"
+        src="{{ url_for('static', filename='js/orders.js') }}"
+    ></script>
+{% endblock %}

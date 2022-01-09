@@ -12,9 +12,9 @@
             alt="Product image"
         />
     </div>
-    <label hidden id="product_url">{{ url_for("resources.products.delete_product", product_id=product.id) }}</label>
-    <form id="product_form" action="{{ action }}" method="{{ method }}" novalidate>
+    <form id="productForm" action="{{ action }}" method="{{ method }}" novalidate>
         <input hidden name="csrf_token" value="{{ csrf_token }}">
+        <input hidden name="product_id" value="{{ product.id }}">
         <div class="row justify-content-md-center mb-3">
             <label for="name" class="col-sm-3 col-form-label">名稱：</label>
             <div class="col">
@@ -106,8 +106,7 @@
                     </div>
                 {% else %}
                     <div class="col text-center">
-                        <label hidden id="returnUrl">{{ url_for(return_endpoint) }}</label>
-                        <button id="deleteButton" class="btn btn-danger" type="button">刪除</button>
+                        <button id="deleteButton" class="btn btn-danger" type="button" data-product-id="{{ product.id }}" data-return-url="{{ url_for(return_endpoint) }}">刪除</button>
                     </div>
                 {% endif %}
             {% endif %}

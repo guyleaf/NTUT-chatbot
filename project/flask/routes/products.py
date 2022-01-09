@@ -1,4 +1,4 @@
-﻿from flask import request, Blueprint, render_template, redirect, url_for
+﻿from flask import request, Blueprint, render_template, redirect, url_for, abort
 from flask_jwt_extended import current_user, get_jwt
 
 from app import firestoreDAO
@@ -80,7 +80,7 @@ def product_page(product_id):
     product = firestoreDAO.get_product_by_id(product_id)
 
     if product is None:
-        return redirect(url_for("resources.products.search_page"))
+        abort(404)
 
     template_name = None
     if current_user.is_seller():
@@ -113,7 +113,7 @@ def update_product(product_id):
     new_product = product_schema.load(new_product)
     old_product = firestoreDAO.get_product_by_id(product_id)
     if old_product is None:
-        return redirect(url_for("resources.products.search_page"))
+        abort(404)
 
     image = new_product.pop("image", None)
     if image:
@@ -136,7 +136,11 @@ def update_product(product_id):
         firestoreDAO.update_product(product_id, modified_contents)
 
     return redirect(
-        url_for("resources.products.product_page", product_id=product_id)
+        url_for(
+            "resources.products.product_page",
+            product_id=product_id,
+            return_endpoint=request.args.get("return_endpoint"),
+        )
     )
 
 

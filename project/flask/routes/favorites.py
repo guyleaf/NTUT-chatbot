@@ -32,7 +32,7 @@ def my_favorites_page():
         "myFavorites.html",
         product_infos=product_infos,
         total=len(product_infos),
-        is_seller=current_user.is_seller()
+        is_seller=current_user.is_seller(),
     )
 
 

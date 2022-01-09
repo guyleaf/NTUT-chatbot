@@ -26,11 +26,14 @@ class FlaskSettings:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
-    SQLALCHEMY_DATABASE_URI = (
-        "mysql+pymysql://"
-        + f"{db_user}:{db_pass}@{db_ip}/{db_name}"
-        # + f"?unix_socket=cloudsql/{sql_instance_connection_name}"
-    )
+
+    if os.environ["FLASK_ENV"] != "production":
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{db_user}:{db_pass}@{db_ip}/{db_name}"
+        )
+    else:
+        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket=/cloudsql/{sql_instance_connection_name}"
+
     LINE_CLIENT_ID = access_secret_version(
         "projects/567768457788/secrets/GPU_A_LINE_LOGIN_CLIENT_ID", 1
     )

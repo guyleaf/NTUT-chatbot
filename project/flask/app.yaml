@@ -2,4 +2,3 @@ service: web-gpu-a
 runtime: python39
 env_variables:
     FLASK_ENV: "production"
-    DATABASE_IP: "35.201.174.23:3306"

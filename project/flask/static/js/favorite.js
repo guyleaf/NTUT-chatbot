@@ -24,9 +24,7 @@ function setupAddFavoriteFunction(addButtonTarget, removeButtonTarget, callback)
         $(e.target).siblings(removeButtonTarget).show();
         addFavoriteModal.show();
       })
-      .fail(function (error) {
-        window.helpers.handleErrorResponse(error);
-      });
+      .fail(window.helpers.handleErrorResponse);
   });
 
   _addEventListenersForClosed("addFavoriteSuccessHint", callback);
@@ -47,9 +45,7 @@ function setupDeleteFavoriteFunction(addButtonTarget, removeButtonTarget, callba
         $(e.target).siblings(addButtonTarget).show();
         deleteFavoriteModal.show();
       })
-      .fail(function (error) {
-        window.helpers.handleErrorResponse(error);
-      });
+      .fail(window.helpers.handleErrorResponse);
   });
 
   _addEventListenersForClosed("deleteFavoriteSuccessHint", callback);

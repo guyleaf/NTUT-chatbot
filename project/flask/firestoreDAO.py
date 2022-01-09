@@ -1,6 +1,7 @@
 import random
-from typing import Any
+from typing import Any, Optional
 from firebase_admin import firestore, initialize_app
+from helpers import chunks, convert_timezone
 
 from settings import company_id
 
@@ -77,15 +78,19 @@ class FirestoreDAO:
             product.to_dict() for product in results
         ]
 
-    def get_product_by_id(self, product_id: str) -> "dict[str, Any]":
+    def get_product_by_id(self, product_id: str) -> Optional["dict[str, Any]"]:
         result = self._get_product_document_by_id(product_id)
         return result.to_dict() if result else None
 
     def get_products_by_ids(
         self, product_ids: "list[str]"
     ) -> "list[dict[str, Any]]":
-        results = self._get_products_stream_by_ids(product_ids)
-        return [product.to_dict() for product in results]
+        results = []
+        for product_ids in chunks(product_ids, 10):
+            result = self._get_products_stream_by_ids(product_ids)
+            results.extend([product.to_dict() for product in result])
+
+        return results
 
     def get_favorite_product_ids(self, user_id: str) -> "list[str]":
         return (
@@ -98,11 +103,8 @@ class FirestoreDAO:
     # myFavorites
     def get_favorite_products(self, user_id: str) -> "list[dict[str, Any]]":
         favorite_product_ids = self.get_favorite_product_ids(user_id)
-        return (
-            self.get_products_by_ids(favorite_product_ids)
-            if len(favorite_product_ids) != 0
-            else []
-        )
+        print(favorite_product_ids)
+        return self.get_products_by_ids(favorite_product_ids)
 
     def is_product_existed(self, product_id: str) -> bool:
         product = self._get_product_document_by_id(product_id)
@@ -132,42 +134,75 @@ class FirestoreDAO:
             }
         )
 
-    # orderRecord, orderManagement
-    def get_orders(self, user_id):
-        orders = []
-        if self.is_admin(user_id):
-            orders_collection = self._db.collection("orders").stream()
-            orders = orders_collection.to_dict()
-        else:
-            orders_collection = (
-                self._db.collection("orders")
-                .where("user_id", "==", user_id)
-                .order_by("timestamp", direction=firestore.Query.DESCENDING)
-                .stream()
+    def get_order_by_id(self, order_id: str):
+        order_ref = self._db.document(
+            f"companies/{company_id}/orders/{order_id}"
+        ).get()
+        return order_ref.to_dict()
+
+    def get_orders(self, user_id: str, is_seller: bool):
+        orders_collection = self._db.collection(
+            f"companies/{company_id}/orders"
+        )
+
+        if not is_seller:
+            orders_collection = orders_collection.where(
+                "user_id", "==", user_id
             )
-            for info in orders_collection:
-                orders.append(info._data)
+
+        orders_collection = orders_collection.order_by(
+            "created_time", direction=firestore.firestore.Query.DESCENDING
+        )
+
+        orders = []
+        for order in orders_collection.stream():
+            order = order.to_dict()
+            order["created_time"] = convert_timezone(order["created_time"])
+            order["updated_time"] = convert_timezone(order["updated_time"])
+            order.setdefault(
+                "product_name",
+                self.get_product_by_id(order["product_id"])["name"],
+            )
+            orders.append(order)
+
         return orders
 
-    def is_order_existed(self, order_id: str) -> bool:  # Ron wrote
-        order_collection = (
-            self._db.collection_group("orders")
-            .where("id", "==", order_id)
-            .get()
+    def add_order(self, order: "dict[str, Any]"):
+        transaction = self._db.transaction()
+        order_ref = self._db.collection(
+            f"companies/{company_id}/orders"
+        ).document()
+        product_ref = self._get_product_document_by_id(
+            order["product_id"]
+        ).reference
+
+        order.setdefault("id", order_ref.id)
+
+        @firestore.firestore.transactional
+        def add_order(
+            transaction: firestore.firestore.Transaction,
+            order_ref: firestore.firestore.DocumentReference,
+            product_ref: firestore.firestore.DocumentReference,
+            order: "dict[str, Any]",
+        ):
+            transaction.create(order_ref, order)
+            transaction.update(
+                product_ref,
+                {
+                    "status.quantity": firestore.firestore.Increment(
+                        -order["quantity"]
+                    )
+                },
+            )
+
+        add_order(transaction, order_ref, product_ref, order)
+        return order_ref.id
+
+    def update_order(self, order_id: str, order: "dict[str, Any]"):
+        order_ref = self._db.document(
+            f"companies/{company_id}/orders/{order_id}"
         )
-        return len(order_collection) == 1
-
-    #
-    def add_order(self, user_id: str, order_info: dict):  # Ron wrote
-        order_info["user_id"] = user_id
-        order_info["timestamp"] = firestore.SERVER_TIMESTAMP
-        self._db.collection("orders").add(order_info)
-
-    # orderManagement
-    def update_order(self, order_info):  # Ron wrote
-        order_id = order_info["order_id"]
-        order_doc = self._db.document(f"orders/{order_id}")
-        order_doc.set(order_info)
+        order_ref.update(order)
 
     def add_product(self, product: "dict[str, Any]") -> int:
         transaction = self._db.transaction()
@@ -202,12 +237,12 @@ class FirestoreDAO:
             )
 
         add_product(transaction, shard_ref, product_ref, product)
-        return product["id"]
+        return product_ref.id
 
     def delete_product(self, product_id):
         product = self._get_product_document_by_id(product_id)
         if product:
-            product.reference.set({"status.is_deleted": True})
+            product.reference.update({"status.is_deleted": True})
 
     def update_product(self, product_id: str, product: "dict[str, Any]"):
         transaction = self._db.transaction()

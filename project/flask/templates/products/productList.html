@@ -1,8 +1,8 @@
 {% for product_info in product_infos %}
 {% set product_status = product_info.product.status %}
 {% set product_id = product_info.product.id %}
-{% set can_buy = not product_status.is_deleted and product_status.is_available and product_status.quantity > 0 %}
-{% set purchase_button_enabled = is_seller or can_buy %}
+{% set can_buy = product_status.is_available and product_status.quantity > 0 %}
+{% set purchase_button_enabled = (is_seller or can_buy) and not product_status.is_deleted %}
 {% set purchase_button_text = "編輯" if is_seller else ("購買" if can_buy else "無法購買") %}
 {% set return_endpoint = return_endpoint or "resources.products.search_page" %}
 
@@ -14,13 +14,13 @@
             alt="Card image cap"
             style="opacity: {{ 0.5 if not can_buy else 1 }}"
         />
-        <div class="card-body">
+        <div class="card-body {{ 'text-muted' if product_status.is_deleted else '' }}">
             <h5 class="card-title mt-3">{{ product_info.product.name }}</h5>
             <div class="mb-3 card-info">
                 <div class="brand">品牌：{{ product_info.product.brand }}</div>
                 <div class="price">價格：{{ product_info.product.price }}</div>
                 {% if product_status.is_deleted %}
-                    <label class="fw-bold text-danger">此商品已刪除</label>
+                    <label class="fw-bold text-danger">此商品已被刪除</label>
                 {% elif product_status.is_available %}
                     <div class="quantity">
                         剩餘數量：

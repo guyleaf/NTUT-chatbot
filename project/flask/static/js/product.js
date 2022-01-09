@@ -1,5 +1,5 @@
 $(function () {
-  const form = $("#product_form");
+  const form = $("#productForm");
   form.submit(function (event) {
     if (!form[0].checkValidity()) {
       event.preventDefault();
@@ -9,15 +9,17 @@ $(function () {
     form.addClass("was-validated");
   });
 
-  const returnUrl = $("#returnUrl").text();
-  const productUrl = $("#product_url").text();
+
   $("#deleteButton").click(function (e) {
     e.preventDefault();
 
-    window.helpers.ajax("DELETE", productUrl, JSON.stringify({}))
+    const returnUrl = $(e.target).data("return-url");
+    const productId = $(e.target).data("product-id");
+
+    window.helpers.ajax("DELETE", `/products/${productId}`, JSON.stringify({}))
       .done(function (data) {
         window.helpers.handleJsonResponse(data);
-        console.log(data);
+
         window.location.href = returnUrl;
       })
       .fail(window.helpers.handleErrorResponse);
