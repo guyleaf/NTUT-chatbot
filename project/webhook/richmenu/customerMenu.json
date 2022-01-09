@@ -5,7 +5,7 @@
     },
     "selected": true,
     "name": "customerMenu",
-    "chatBarText": "{} 購物主選單",
+    "chatBarText": "GPU 購物主選單",
     "areas": [
         {
             "bounds": {
@@ -16,8 +16,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/search",
-                "data": "?user_id={}"
+                "uri": "/products/search"
             }
         },
         {
@@ -29,7 +28,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/{}/myFavorites"
+                "uri": "/myFavorites"
             }
         },
         {
@@ -41,7 +40,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/{}/orders"
+                "uri": "/orders"
             }
         },
         {
@@ -53,8 +52,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/report",
-                "data": "?user_id={}"
+                "uri": "/report"
             }
         }
     ]

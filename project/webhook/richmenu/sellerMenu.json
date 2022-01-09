@@ -16,7 +16,7 @@
             },
             "action": {
                 "type": "uri",
-                "data": "stockManagement"
+                "uri": "/products/search"
             }
         },
         {
@@ -27,8 +27,8 @@
                 "height": 405
             },
             "action": {
-                "type": "postback",
-                "data": "myFavorite"
+                "type": "uri",
+                "uri": "/myFavorites"
             }
         },
         {
@@ -39,8 +39,8 @@
                 "height": 405
             },
             "action": {
-                "type": "postback",
-                "data": "orderManagement"
+                "type": "uri",
+                "uri": "/orders"
             }
         },
         {
@@ -51,8 +51,8 @@
                 "height": 405
             },
             "action": {
-                "type": "postback",
-                "data": "statisticReport"
+                "type": "uri",
+                "uri": "/report"
             }
         }
     ]

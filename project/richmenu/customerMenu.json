@@ -4,8 +4,8 @@
         "height": 810
     },
     "selected": true,
-    "name": "adminMenu",
-    "chatBarText": "{} 購物管理主選單",
+    "name": "customerMenu",
+    "chatBarText": "GPU 購物主選單",
     "areas": [
         {
             "bounds": {
@@ -15,9 +15,8 @@
                 "height": 405
             },
             "action": {
-                "type": "uri",
-                "uri": "/search",
-                "data": "?user_id={}"
+                "type": "postback",
+                "data": "searchGPU"
             }
         },
         {
@@ -28,32 +27,20 @@
                 "height": 405
             },
             "action": {
-                "type": "uri",
-                "uri": "/{}/myFavorites"
+                "type": "postback",
+                "data": "myFavorite"
             }
         },
         {
             "bounds": {
                 "x": 0,
                 "y": 405,
-                "width": 400,
+                "width": 800,
                 "height": 405
             },
             "action": {
-                "type": "uri",
-                "uri": "/{}/orders"
-            }
-        },
-        {
-            "bounds": {
-                "x": 400,
-                "y": 405,
-                "width": 400,
-                "height": 405
-            },
-            "action": {
-                "type": "uri",
-                "uri": "/{}/products"
+                "type": "postback",
+                "data": "orderRecord"
             }
         },
         {
@@ -64,9 +51,8 @@
                 "height": 405
             },
             "action": {
-                "type": "uri",
-                "uri": "/report",
-                "data": "?user_id={}"
+                "type": "postback",
+                "data": "marketReport"
             }
         }
     ]
