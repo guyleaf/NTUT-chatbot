@@ -82,14 +82,6 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
 
 
 @jwt.unauthorized_loader
-def handle_no_token(_):
-    message = "UnAuthorized."
-    if request.content_type and "application/json" in request.content_type:
-        return make_api_response(False, message), 401
-    else:
-        return message, 401
-
-
 @jwt.invalid_token_loader
 def jwt_exception_handler(_):
     return redirect_to_login()

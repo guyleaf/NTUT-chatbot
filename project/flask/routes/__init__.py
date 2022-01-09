@@ -22,5 +22,7 @@ def redirect_route():
     args = request.args.to_dict()
     page = args.get("page")
     return redirect(
-        url_for(page, **json.loads(args["args"])) if page else "line://"
+        url_for(page, **json.loads(args["args"]))
+        if page
+        else "https://line.me/R/"
     )
