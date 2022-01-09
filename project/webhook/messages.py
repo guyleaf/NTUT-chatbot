@@ -11,6 +11,8 @@ from settings import login_url
 
 welcome_message = get_text_send_message_object("歡迎使用 GPU 購物小幫手")
 
+registered_message = "歡迎，{} {}"
+
 register_message = TemplateSendMessage(
     alt_text="以下有新訊息...",
     template=CarouselTemplate(

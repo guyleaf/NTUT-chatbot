@@ -36,6 +36,7 @@ Session = sessionmaker(bind=eng, expire_on_commit=False)
 if __name__ == "__main__":
     session = Session()
     users = session.query(User).all()
+    session.close()
     for user in users:
         print(user.id, user.username, user.email, user.line_id, user.role.name)
     session.close()

@@ -9,6 +9,7 @@ from messages import (
     register_message,
     functional_explain_message_for_customer,
     functional_explain_message_for_others,
+    registered_message,
 )
 
 import cloudSqlClient as cloudSql
@@ -55,6 +56,16 @@ def handle_follow(event: FollowEvent):
             else functional_explain_message_for_others
         )
 
+        if user.role.name == "admin":
+            role_name = "系統管理員"
+        elif user.role.name == "seller":
+            role_name = "管理員"
+        else:
+            role_name = "顧客"
+
+        line_bot_api.push_message(
+            line_id, registered_message.format(role_name, user.username)
+        )
         line_bot_api.push_message(line_id, functional_explain_message)
         richmenu.create(line_id, is_customer)
     else:
