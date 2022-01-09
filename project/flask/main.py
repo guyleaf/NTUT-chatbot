@@ -48,7 +48,7 @@ def user_identity_lookup(user: User):
 @jwt.user_lookup_loader
 def user_lookup_callback(_, jwt_data) -> Optional[User]:
     identity = jwt_data["sub"]
-    user = User.query.filter_by(id=identity).first()
+    user = User.query.filter_by(id=identity).one_or_none()
     if user:
         user = UserInfo(user)
 
@@ -82,6 +82,14 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
 
 
 @jwt.unauthorized_loader
+def handle_no_token(_):
+    message = "UnAuthorized."
+    if request.content_type and "application/json" in request.content_type:
+        return make_api_response(False, message), 401
+    else:
+        return message, 401
+
+
 @jwt.invalid_token_loader
 def jwt_exception_handler(_):
     return redirect_to_login()

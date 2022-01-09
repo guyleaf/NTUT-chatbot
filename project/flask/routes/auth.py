@@ -59,6 +59,8 @@ def auth():
         line_bot_client.push_registered_success_message(
             user_data.line_id, user_data.username
         )
+    else:
+        line_bot_client.push_login_success_message(user_data)
 
     access_token = create_access_token(identity=user_data)
     response = redirect(
