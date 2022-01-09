@@ -27,4 +27,4 @@ db_name = "security"
 sql_instance_connection_name = "chatbot-project-3135:asia-east1:chatbots-gpu-a"
 
 DATABASE_URI = f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket=/cloudsql/{sql_instance_connection_name}"
-DATABASE_URI = f"mysql+pymysql://{db_user}:{db_pass}@127.0.0.1/{db_name}"
+# DATABASE_URI = f"mysql+pymysql://{db_user}:{db_pass}@127.0.0.1/{db_name}"

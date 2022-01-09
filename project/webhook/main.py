@@ -11,7 +11,7 @@ from messages import (
     functional_explain_message_for_others,
     registered_message,
 )
-
+from helpers import get_text_send_message_object
 import cloudSqlClient as cloudSql
 
 
@@ -64,7 +64,10 @@ def handle_follow(event: FollowEvent):
             role_name = "顧客"
 
         line_bot_api.push_message(
-            line_id, registered_message.format(role_name, user.username)
+            line_id,
+            get_text_send_message_object(
+                registered_message.format(role_name, user.username)
+            ),
         )
         line_bot_api.push_message(line_id, functional_explain_message)
         richmenu.create(line_id, is_customer)
