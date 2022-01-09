@@ -29,6 +29,22 @@ register_message = TemplateSendMessage(
     ),
 )
 
+login_message = TemplateSendMessage(
+    alt_text="以下有新訊息...",
+    template=CarouselTemplate(
+        columns=[
+            CarouselColumn(
+                thumbnail_image_url="https://obs.line-scdn.net/0htYAKZc2HK3Z8MjzFDBdUIVhvIBRPUDV9XgYvEBlgACYNVxkgCy87dFFOECUWVwVERAc4eB9OEw8Ofh5LATUBaxI/f500x500",
+                title="GPU-A 會員系統",
+                text="你是舊會員，請登入",
+                actions=[
+                    URITemplateAction(label="登入", uri=login_url),
+                ],
+            )
+        ]
+    ),
+)
+
 functional_explain_message_for_customer = get_text_send_message_object(
     "我們提供\n"
     + "1. 查詢 GPU：\n"

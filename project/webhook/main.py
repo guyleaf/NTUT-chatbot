@@ -1,17 +1,10 @@
 from linebot.models import FollowEvent
 
-from app import webhook_handler, line_bot_api, logger, richmenu
+from app import webhook_handler, line_bot_api, logger
 
 # from dialogflow.dialogflowClient import DialogflowClient
 # from dialogflow.dialogflowHandler import DialogflowHandler
-from messages import (
-    welcome_message,
-    register_message,
-    functional_explain_message_for_customer,
-    functional_explain_message_for_others,
-    registered_message,
-)
-from helpers import get_text_send_message_object
+from messages import register_message, login_message
 import cloudSqlClient as cloudSql
 
 
@@ -48,29 +41,7 @@ def handle_follow(event: FollowEvent):
 
     user = cloudSql.find_user(line_id)
     if user:
-        line_bot_api.reply_message(reply_token, welcome_message)
-        is_customer = user.role.name == "customer"
-        functional_explain_message = (
-            functional_explain_message_for_customer
-            if is_customer
-            else functional_explain_message_for_others
-        )
-
-        if user.role.name == "admin":
-            role_name = "系統管理員"
-        elif user.role.name == "seller":
-            role_name = "管理員"
-        else:
-            role_name = "顧客"
-
-        line_bot_api.push_message(
-            line_id,
-            get_text_send_message_object(
-                registered_message.format(role_name, user.username)
-            ),
-        )
-        line_bot_api.push_message(line_id, functional_explain_message)
-        richmenu.create(line_id, is_customer)
+        line_bot_api.reply_message(reply_token, login_message)
     else:
         line_bot_api.reply_message(reply_token, register_message)
 
