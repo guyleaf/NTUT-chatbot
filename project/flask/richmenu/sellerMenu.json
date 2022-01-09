@@ -52,7 +52,7 @@
             },
             "action": {
                 "type": "uri",
-                "uri": "/report?openExternalBrowser=1"
+                "uri": "/reports/others?openExternalBrowser=1"
             }
         }
     ]

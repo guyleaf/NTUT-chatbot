@@ -26,6 +26,9 @@ richmenu_for_customer_image_path = "richmenu/customer.png"
 richmenu_for_seller_json_path = "richmenu/sellerMenu.json"
 richmenu_for_seller_image_path = "richmenu/seller.png"
 
+# reports
+customer_report = "https://datastudio.google.com/embed/reporting/85cbdaae-3703-4f2b-b4cb-553fdfb5488e/page/AI7iC"
+others_report = "https://datastudio.google.com/embed/reporting/855cb2b2-bc9b-4015-9bc5-bc3ddfacc2a1/page/tG7iC"
 
 # Flask Settings
 class FlaskSettings:
