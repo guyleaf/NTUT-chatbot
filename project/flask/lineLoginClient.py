@@ -7,7 +7,7 @@ from authlib.oidc.core import CodeIDToken
 from authlib.common.security import generate_token
 
 from flask import session, current_app
-from flask.app import Flask
+from flask import Flask
 
 
 class LineLoginClient:

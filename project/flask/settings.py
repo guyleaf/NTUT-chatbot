@@ -40,6 +40,12 @@ class FlaskSettings:
     LINE_CLIENT_SECRET = access_secret_version(
         "projects/567768457788/secrets/GPU_A_LINE_LOGIN_CLIENT_SECRET", 1
     )
+    LINE_CHANNEL_SECRET_TOKEN = access_secret_version(
+        "projects/567768457788/secrets/GPU_A_LINE_CHANNEL_SECRET_TOKEN", 1
+    )
+    LINE_CHANNEL_ACCESS_TOKEN = access_secret_version(
+        "projects/567768457788/secrets/GPU_A_LINE_CHANNEL_ACCESS_TOKEN", 1
+    )
 
     JWT_SECRET_KEY = access_secret_version(
         "projects/567768457788/secrets/GPU_A_JWT_SECRET_KEY_FOR_WEBSITE", 1
