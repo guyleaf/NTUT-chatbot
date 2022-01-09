@@ -18,6 +18,14 @@ db_ip = os.environ.get("DATABASE_IP", "127.0.0.1:3306")
 
 sql_instance_connection_name = "chatbot-project-3135:asia-east1:chatbots-gpu-a"
 
+# richmenu
+line_api_base_url = "https://api.line.me/v2/bot/"
+web_url = "https://web-gpu-a-dot-chatbot-project-3135.de.r.appspot.com"
+richmenu_for_customer_json_path = "richmenu/customerMenu.json"
+richmenu_for_customer_image_path = "richmenu/customer.png"
+richmenu_for_seller_json_path = "richmenu/sellerMenu.json"
+richmenu_for_seller_image_path = "richmenu/seller.png"
+
 
 # Flask Settings
 class FlaskSettings:

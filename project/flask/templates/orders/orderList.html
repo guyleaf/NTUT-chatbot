@@ -29,7 +29,7 @@
                         {{ order.created_time.strftime("%H:%M:%S") }}
                     </th>
                     <td class="name">
-                        <a class="link-primary" href="{{ url_for('resources.products.product_page', product_id=order.product_id) }}">
+                        <a class="link-primary" href="{{ url_for('resources.products.product_page', product_id=order.product_id, return_endpoint='resources.orders.order_list_page') }}">
                             {{ order.product_name }}
                         </a>
                         <span class="text-muted">({{ order.product_id }})</span>

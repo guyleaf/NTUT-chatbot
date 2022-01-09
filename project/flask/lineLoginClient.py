@@ -1,5 +1,8 @@
 ﻿from typing import Any
-from authlib.integrations.base_client.errors import OAuthError
+from authlib.integrations.base_client.errors import (
+    MismatchingStateError,
+    OAuthError,
+)
 
 from authlib.integrations.flask_client import OAuth
 from authlib.jose import JsonWebToken
@@ -49,11 +52,14 @@ class LineLoginClient:
     def _get_session(self) -> "dict[str, str]":
         return session.pop("line_login", None)
 
-    def authorize_redirect(self, redirect_uri: str):
+    def authorize_redirect(self, redirect_uri: str, failed: bool = False):
         data = {
             "nonce": self._generate_token(),
             "state": self._generate_token(),
         }
+
+        if failed:
+            data.setdefault("disable_auto_login", True)
 
         self._save_session(data)
         return self._oauth.line.authorize_redirect(redirect_uri, **data)
@@ -69,6 +75,9 @@ class LineLoginClient:
                 claims_options=self._claims_options,
                 claims_params=self._get_session(),
             )
+        except MismatchingStateError as e:
+            current_app.log_exception(e)
+            raise
         except OAuthError as e:
             current_app.log_exception(e)
             return None

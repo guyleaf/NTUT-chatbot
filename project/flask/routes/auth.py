@@ -1,5 +1,6 @@
 ﻿import secrets
 from datetime import datetime, timedelta, timezone
+from authlib.integrations.base_client.errors import MismatchingStateError
 from flask import Blueprint, url_for, request, abort, redirect, session
 from flask_jwt_extended import (
     create_access_token,
@@ -9,7 +10,7 @@ from flask_jwt_extended import (
 )
 from flask_jwt_extended.utils import get_jwt
 
-from app import oauth_client, db, firestoreDAO
+from app import oauth_client, db, firestoreDAO, line_bot_client
 from decorators import jwt_required
 from models import Role, TokenBlocklist, User
 
@@ -19,7 +20,9 @@ auth_resource = Blueprint("auth", __name__, static_folder="templates")
 @auth_resource.route("/login", methods=["GET"])
 def login():
     redirect_uri = url_for("resources.auth.auth", _external=True)
-    return oauth_client.authorize_redirect(redirect_uri)
+    return oauth_client.authorize_redirect(
+        redirect_uri, request.args.get("failed", False)
+    )
 
 
 @auth_resource.route("/auth", methods=["GET"])
@@ -29,7 +32,12 @@ def auth():
     if code is None or state is None:
         abort(400)
 
-    user = oauth_client.authorize_access_token()
+    user = None
+    try:
+        user = oauth_client.authorize_access_token()
+    except MismatchingStateError:
+        return redirect(url_for("resources.auth.login", failed=True))
+
     if user is None:
         abort(500)
 
@@ -48,12 +56,15 @@ def auth():
         db.session.add(user_data)
         db.session.commit()
         firestoreDAO.initialize_data_for_user(user_data.id)
+        line_bot_client.push_registered_success_message(
+            user_data.line_id, user_data.username
+        )
 
     access_token = create_access_token(identity=user_data)
     response = redirect(
         url_for(
             "resources.redirect_route",
-            **session.get("last_watched_endpoint", {}),
+            **session.pop("last_watched_endpoint", {}),
         )
     )
     set_access_cookies(response, access_token)

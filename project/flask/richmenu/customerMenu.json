@@ -1,0 +1,59 @@
+{
+    "size": {
+        "width": 1200,
+        "height": 810
+    },
+    "selected": true,
+    "name": "customerMenu",
+    "chatBarText": "GPU 購物主選單",
+    "areas": [
+        {
+            "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 800,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/products/search?openExternalBrowser=1"
+            }
+        },
+        {
+            "bounds": {
+                "x": 800,
+                "y": 0,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/myFavorites?openExternalBrowser=1"
+            }
+        },
+        {
+            "bounds": {
+                "x": 0,
+                "y": 405,
+                "width": 800,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/orders?openExternalBrowser=1"
+            }
+        },
+        {
+            "bounds": {
+                "x": 800,
+                "y": 405,
+                "width": 400,
+                "height": 405
+            },
+            "action": {
+                "type": "uri",
+                "uri": "/report?openExternalBrowser=1"
+            }
+        }
+    ]
+}
