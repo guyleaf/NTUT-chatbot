@@ -84,7 +84,6 @@ def handle_unauthorized_access(e: UnauthorizedAccessException):
 @jwt.invalid_token_loader
 @jwt.unauthorized_loader
 def jwt_exception_handler(_):
-    print(_)
     return redirect_to_login()
 
 
