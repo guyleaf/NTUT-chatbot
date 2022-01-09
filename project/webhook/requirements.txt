@@ -3,3 +3,4 @@ firebase-admin
 line-bot-sdk
 google-cloud-dialogflow
 protobuf-to-dict
+sqlalchemy
