@@ -26,12 +26,12 @@ class User(Base):
     email = Column(String(120), unique=True, nullable=False)
     line_id = Column(String(120), unique=True, nullable=False)
     role_id = Column(Integer(), ForeignKey("role.id"), nullable=False)
-    role = relationship("Role", backref=backref("users"), lazy=False)
+    role = relationship("Role", backref=backref("users"), lazy=True)
 
 
 Base.metadata.bind = eng
 
-Session = sessionmaker(bind=eng)
+Session = sessionmaker(bind=eng, expire_on_commit=False)
 
 if __name__ == "__main__":
     session = Session()
